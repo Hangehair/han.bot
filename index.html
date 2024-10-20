@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台北西門町接髮專家Hange韓哥預約系統</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 500px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    label {
+      font-size: 16px;
+      margin-bottom: 8px;
+      display: block;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>預約系統</h1>
+    <form id="bookingForm">
+      <!-- 姓名 -->
+      <label for="name">姓名：</label>
+      <input type="text" id="name" name="name" required>
+
+      <!-- 電話號碼 -->
+      <label for="phone">電話號碼：</label>
+      <input type="tel" id="phone" name="phone" pattern="^09\d{8}$" placeholder="09XXXXXXXX" required>
+      <div class="error" id="phoneError" style="display:none;">請輸入有效的手機號碼。</div>
+
+      <!-- 預約日期 -->
+      <label for="date">請選擇預約日期：</label>
+      <input type="date" id="date" name="date" required>
+
+      <!-- 預約時間 -->
+      <label for="time">請選擇預約時段：</label>
+      <select id="time" name="time" required>
+        <option value="" disabled selected>請選擇時間</option>
+        <option value="13:00">13:00</option>
+        <option value="14:00">14:00</option>
+        <option value="15:00">15:00</option>
+        <option value="16:00">16:00</option>
+        <option value="17:00">17:00</option>
+      </select>
+
+      <!-- 預約項目 -->
+      <label for="service">請選擇預約項目：</label>
+      <select id="service" name="service" required>
+        <option value="" disabled selected>請選擇項目</option>
+        <option value="接髮">接髮</option>
+        <option value="剪髮">剪髮</option>
+        <option value="染髮">染髮</option>
+        <option value="燙髮">燙髮</option>
+      </select>
+
+      <!-- 生日 -->
+      <label for="birthday">請選擇出生月份：</label>
+      <select id="birthday" name="birthday" required>
+        <option value="" disabled selected>請選擇月份</option>
+        <option value="1">1月</option>
+        <option value="2">2月</option>
+        <option value="3">3月</option>
+        <option value="4">4月</option>
+        <option value="5">5月</option>
+        <option value="6">6月</option>
+        <option value="7">7月</option>
+        <option value="8">8月</option>
+        <option value="9">9月</option>
+        <option value="10">10月</option>
+        <option value="11">11月</option>
+        <option value="12">12月</option>
+      </select>
+
+      <!-- 你是從哪裡聽說我們的 -->
+      <label for="source">你是從哪裡聽說我們的？</label>
+      <select id="source" name="source" required>
+        <option value="" disabled selected>請選擇</option>
+        <option value="Google">Google搜尋</option>
+        <option value="FB">Facebook</option>
+        <option value="IG">Instagram</option>
+        <option value="Friend">朋友推薦</option>
+        <option value="Organizer">預約平台</option>
+      </select>
+
+      <button type="submit">提交預約</button>
+    </form>
+  </div>
+
+  <script>
+    function fetchUserNameFromLINE() {
+      return '王小明'; 
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const nameField = document.getElementById('name');
+      const userName = fetchUserNameFromLINE();
+      nameField.value = userName;
+    });
+
+    const form = document.getElementById('bookingForm');
+    const phoneInput = document.getElementById('phone');
+    const phoneError = document.getElementById('phoneError');
+
+    form.addEventListener('submit', function(event) {
+      const phonePattern = /^09\d{8}$/; 
+      if (!phonePattern.test(phoneInput.value)) {
+        phoneError.style.display = 'block';
+        event.preventDefault();
+      } else {
+        phoneError.style.display = 'none';
+      }
+    });
+  </script>
+
+</body>
+</html>
