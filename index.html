@@ -5,49 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>台北西門町接髮專家Hange韓哥預約系統</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f8f8f8;
-    }
-    .container {
-      padding: 20px;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      background-color: #fff;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    label {
-      font-weight: bold;
-    }
-    input, select, button {
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-      text-align: center;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f8f8f8; }
+    .container { padding: 20px; border: 2px solid #ccc; border-radius: 10px; background-color: #fff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; }
+    form { display: flex; flex-direction: column; gap: 10px; }
+    label { font-weight: bold; }
+    input, select, button { padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; text-align: center; width: 100%; box-sizing: border-box; }
+    button { background-color: #007bff; color: white; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
   </style>
 </head>
 <body>
@@ -132,7 +96,6 @@
         liff.getProfile().then(profile => {
           document.getElementById('name').value = profile.displayName;
         });
-
         liff.getDecodedIDToken().then(idToken => {
           document.getElementById('phone').value = idToken.sub;
         });
@@ -149,233 +112,35 @@
       const referralSource = document.getElementById('referralSource').value;
       const services = Array.from(document.getElementById('service').selectedOptions).map(option => option.value).join(', ');
 
-      const message = {
-  type: "flex",
-  altText: "預約資料如下",
-  contents: {
-    type: "bubble",
-    hero: {
-      type: "image",
-      url: "https://example.com/your-image.jpg",  // 可放上您的品牌圖
-      size: "full",
-      aspectRatio: "20:13",
-      aspectMode: "cover"
-    },
-    body: {
-      type: "box",
-      layout: "vertical",
-      spacing: "md",
-      contents: [
-        {
-          type: "text",
-          text: "預約資料如下",
-          weight: "bold",
-          size: "xl",
-          align: "center",
-          color: "#1DB446"
-        },
-        {
-          type: "box",
-          layout: "vertical",
-          margin: "lg",
-          spacing: "sm",
-          contents: [
-            {
-              type: "box",
-              layout: "baseline",
-              spacing: "sm",
-              contents: [
-                {
-                  type: "text",
-                  text: "名字",
-                  color: "#aaaaaa",
-                  size: "sm",
-                  flex: 2
-                },
-                {
-                  type: "text",
-                  text: name,
-                  wrap: true,
-                  color: "#666666",
-                  size: "sm",
-                  flex: 5
-                }
-              ]
-            },
-            {
-              type: "box",
-              layout: "baseline",
-              spacing: "sm",
-              contents: [
-                {
-                  type: "text",
-                  text: "電話",
-                  color: "#aaaaaa",
-                  size: "sm",
-                  flex: 2
-                },
-                {
-                  type: "text",
-                  text: phone,
-                  wrap: true,
-                  color: "#666666",
-                  size: "sm",
-                  flex: 5
-                }
-              ]
-            },
-            {
-              type: "box",
-              layout: "baseline",
-              spacing: "sm",
-              contents: [
-                {
-                  type: "text",
-                  text: "預約日期",
-                  color: "#aaaaaa",
-                  size: "sm",
-                  flex: 2
-                },
-                {
-                  type: "text",
-                  text: date,
-                  wrap: true,
-                  color: "#666666",
-                  size: "sm",
-                  flex: 5
-                }
-              ]
-            },
-            {
-              type: "box",
-              layout: "baseline",
-              spacing: "sm",
-              contents: [
-                {
-                  type: "text",
-                  text: "預約時段",
-                  color: "#aaaaaa",
-                  size: "sm",
-                  flex: 2
-                },
-                {
-                  type: "text",
-                  text: time,
-                  wrap: true,
-                  color: "#666666",
-                  size: "sm",
-                  flex: 5
-                }
-              ]
-            },
-            {
-              type: "box",
-              layout: "baseline",
-              spacing: "sm",
-              contents: [
-                {
-                  type: "text",
-                  text: "生日月份",
-                  color: "#aaaaaa",
-                  size: "sm",
-                  flex: 2
-                },
-                {
-                  type: "text",
-                  text: `${birthdayMonth}月`,
-                  wrap: true,
-                  color: "#666666",
-                  size: "sm",
-                  flex: 5
-                }
-              ]
-            },
-            {
-              type: "box",
-              layout: "baseline",
-              spacing: "sm",
-              contents: [
-                {
-                  type: "text",
-                  text: "來源",
-                  color: "#aaaaaa",
-                  size: "sm",
-                  flex: 2
-                },
-                {
-                  type: "text",
-                  text: referralSource,
-                  wrap: true,
-                  color: "#666666",
-                  size: "sm",
-                  flex: 5
-                }
-              ]
-            },
-            {
-              type: "box",
-              layout: "baseline",
-              spacing: "sm",
-              contents: [
-                {
-                  type: "text",
-                  text: "預約項目",
-                  color: "#aaaaaa",
-                  size: "sm",
-                  flex: 2
-                },
-                {
-                  type: "text",
-                  text: services,
-                  wrap: true,
-                  color: "#666666",
-                  size: "sm",
-                  flex: 5
-                }
-              ]
-            },
-            {
-              type: "separator",
-              margin: "lg"
-            },
-            {
-              type: "text",
-              text: "請等待韓哥審核並通知",
-              wrap: true,
-              color: "#ff5551",
-              align: "center",
-              margin: "lg"
-            }
-          ]
-        }
-      ]
-    },
-    footer: {
-      type: "box",
-      layout: "vertical",
-      spacing: "sm",
-      contents: [
-        {
-          type: "button",
-          style: "link",
-          height: "sm",
-          action: {
-            type: "uri",
-            label: "Hange韓哥服務地址",
-            uri: "https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy"
+      const flexMessage = {
+        type: 'flex',
+        altText: '預約資料通知',
+        contents: {
+          type: 'bubble',
+          body: {
+            type: 'box',
+            layout: 'vertical',
+            contents: [
+              { type: 'text', text: '預約資料如下', weight: 'bold', size: 'lg' },
+              { type: 'text', text: `名字: ${name}`, size: 'md', wrap: true },
+              { type: 'text', text: `電話: ${phone}`, size: 'md', wrap: true },
+              { type: 'text', text: `預約日期: ${date}`, size: 'md', wrap: true },
+              { type: 'text', text: `預約時段: ${time}`, size: 'md', wrap: true },
+              { type: 'text', text: `生日月份: ${birthdayMonth}月`, size: 'md', wrap: true },
+              { type: 'text', text: `來源: ${referralSource}`, size: 'md', wrap: true },
+              { type: 'text', text: `預約項目: ${services}`, size: 'md', wrap: true },
+              { type: 'text', text: '（請等待韓哥審核並通知）', size: 'md', wrap: true },
+              { type: 'text', text: 'Hange韓哥服務地址：https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy', size: 'sm', wrap: true, color: '#555555' }
+            ]
           }
-        },
-        {
-          type: "spacer",
-          size: "sm"
         }
-      ],
-      flex: 0
-    }
-  }
-};
+      };
 
-liff.sendMessages([message]).then(() => {
-  alert('預約已送出，請等待韓哥審核！');
-  liff.closeWindow();
-}).catch(error => console.error('Error sending message:', error));
+      liff.sendMessages([flexMessage]).then(() => {
+        alert('預約已送出，請等待韓哥審核！');
+        liff.closeWindow();
+      }).catch(error => console.error('Error sending message:', error));
+    });
+  </script>
+</body>
+</html>
