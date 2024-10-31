@@ -101,6 +101,7 @@
 
     document.getElementById('bookingForm').addEventListener('submit', function (event) {
       event.preventDefault();
+
       const date = document.getElementById('date').value;
       const time = document.getElementById('time').value;
       const name = document.getElementById('name').value;
@@ -109,99 +110,40 @@
       const referralSource = document.getElementById('referralSource').value;
       const services = Array.from(document.getElementById('service').selectedOptions).map(option => option.value).join(', ');
 
-      // 構建 Flex Message 內容
-      const message = {
+      const address = "台北市萬華區西門町109-2號"; // 替換為實際地址
+      const addressLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+
+      const flexMessage = {
         "type": "flex",
         "altText": "預約資訊",
         "contents": {
           "type": "bubble",
-          "hero": {
-            "type": "image",
-            "url": "https://example.com/your-image-url.jpg", // 替換為您的圖片 URL
-            "size": "full",
-            "aspectRatio": "20:13",
-            "aspectMode": "cover"
-          },
           "body": {
             "type": "box",
             "layout": "vertical",
             "contents": [
-              {
-                "type": "text",
-                "text": "預約資訊",
-                "weight": "bold",
-                "size": "xl"
-              },
-              {
-                "type": "separator",
-                "margin": "md"
-              },
-              {
-                "type": "text",
-                "text": `姓名: ${name}`,
-                "size": "md",
-                "margin": "md"
-              },
-              {
-                "type": "text",
-                "text": `電話: ${phone}`,
-                "size": "md",
-                "margin": "md"
-              },
-              {
-                "type": "text",
-                "text": `預約日期: ${date}`,
-                "size": "md",
-                "margin": "md"
-              },
-              {
-                "type": "text",
-                "text": `預約時段: ${time}`,
-                "size": "md",
-                "margin": "md"
-              },
-              {
-                "type": "text",
-                "text": `生日月份: ${birthdayMonth}`,
-                "size": "md",
-                "margin": "md"
-              },
-              {
-                "type": "text",
-                "text": `來源: ${referralSource}`,
-                "size": "md",
-                "margin": "md"
-              },
-              {
-                "type": "text",
-                "text": `預約項目: ${services}`,
-                "size": "md",
-                "margin": "md"
-              }
-            ]
-          },
-          "footer": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-              {
-                "type": "button",
-                "style": "primary",
-                "action": {
-                  "type": "uri",
-                  "label": "回到首頁",
-                  "uri": "https://your-homepage-url.com" // 替換為您的首頁 URL
-                }
-              }
+              { "type": "text", "text": "預約資訊", "weight": "bold", "size": "lg", "align": "center" },
+              { "type": "text", "text": `姓名：${name}`, "margin": "md", "align": "center" },
+              { "type": "text", "text": `電話：${phone}`, "margin": "md", "align": "center" },
+              { "type": "text", "text": `預約日期：${date}`, "margin": "md", "align": "center" },
+              { "type": "text", "text": `預約時段：${time}`, "margin": "md", "align": "center" },
+              { "type": "text", "text": `生日月份：${birthdayMonth}`, "margin": "md", "align": "center" },
+              { "type": "text", "text": `來源：${referralSource}`, "margin": "md", "align": "center" },
+              { "type": "text", "text": `預約項目：${services}`, "margin": "md", "align": "center" },
+              { "type": "text", "text": "地址：", "margin": "md", "align": "center" },
+              { "type": "text", "text": address, "margin": "md", "align": "center", "wrap": true, "action": { "type": "uri", "uri": addressLink } }
             ]
           }
         }
       };
 
-      // 發送 Flex Message
-      liff.sendMessages([message]).then(() => {
+      liff.sendMessages([flexMessage]).then(() => {
         alert('預約資訊已發送！');
-        window.location.reload(); // 預約送出後重新載入頁面
+        document.getElementById('bookingForm').reset(); // 重置表單
       }).catch((err) => {
-        console.error(err);
-        alert('發送失敗，請重試
+        alert('發送失敗，請重試！');
+      });
+    });
+  </script>
+</body>
+</html>
