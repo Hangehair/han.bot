@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,13 +19,13 @@
     <form id="bookingForm">
       <label for="name">1.姓名：</label>
       <input type="text" id="name" placeholder="名字" required>
-      
+
       <label for="phone">2.電話：</label>
       <input type="tel" id="phone" placeholder="電話" required>
-      
+
       <label for="date">3.預約日期：</label>
-      <input type="date" id="date" class="date-picker" placeholder="請選擇預約日期" required>
-      
+      <input type="date" id="date" placeholder="請選擇預約日期" required>
+
       <label for="time">4.預約時段：</label>
       <select id="time" required>
         <option value="" disabled selected>請選擇預約時段</option>
@@ -130,7 +130,24 @@
               { type: 'text', text: `來源: ${referralSource}`, size: 'md', wrap: true },
               { type: 'text', text: `預約項目: ${services}`, size: 'md', wrap: true },
               { type: 'text', text: '（請等待韓哥審核並通知）', size: 'md', wrap: true },
-              { type: 'text', text: 'Hange韓哥服務地址：https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy', size: 'sm', wrap: true, color: '#555555' }
+              {
+                type: 'text',
+                text: 'Hange韓哥服務地址：',
+                size: 'sm',
+                wrap: true,
+                color: '#555555'
+              },
+              {
+                type: 'text',
+                text: '點此查看地址',
+                size: 'sm',
+                wrap: true,
+                color: '#007bff',
+                action: {
+                  type: 'uri',
+                  uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy'
+                }
+              }
             ]
           }
         }
