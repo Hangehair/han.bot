@@ -96,9 +96,6 @@
         liff.getProfile().then(profile => {
           document.getElementById('name').value = profile.displayName;
         });
-        liff.getDecodedIDToken().then(idToken => {
-          document.getElementById('phone').value = idToken.sub;
-        });
       }).catch(err => console.error(err));
     });
 
@@ -112,40 +109,88 @@
       const referralSource = document.getElementById('referralSource').value;
       const services = Array.from(document.getElementById('service').selectedOptions).map(option => option.value).join(', ');
 
-      const flexMessage = {
-        type: 'flex',
-        altText: '預約資料通知',
-        contents: {
-          type: 'bubble',
-          body: {
-            type: 'box',
-            layout: 'vertical',
-            contents: [
-              { type: 'text', text: '預約資料如下', weight: 'bold', size: 'lg' },
-              { type: 'text', text: `名字: ${name}`, size: 'md', wrap: true },
-              { type: 'text', text: `電話: ${phone}`, size: 'md', wrap: true },
-              { type: 'text', text: `預約日期: ${date}`, size: 'md', wrap: true },
-              { type: 'text', text: `預約時段: ${time}`, size: 'md', wrap: true },
-              { type: 'text', text: `生日月份: ${birthdayMonth}月`, size: 'md', wrap: true },
-              { type: 'text', text: `來源: ${referralSource}`, size: 'md', wrap: true },
-              { type: 'text', text: `預約項目: ${services}`, size: 'md', wrap: true },
-              { type: 'text', text: '（請等待韓哥審核並通知）', size: 'md', wrap: true },
+      // 構建 Flex Message 內容
+      const message = {
+        "type": "flex",
+        "altText": "預約資訊",
+        "contents": {
+          "type": "bubble",
+          "hero": {
+            "type": "image",
+            "url": "https://example.com/your-image-url.jpg", // 替換為您的圖片 URL
+            "size": "full",
+            "aspectRatio": "20:13",
+            "aspectMode": "cover"
+          },
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
               {
-                type: 'text',
-                text: 'Hange韓哥服務地址：',
-                size: 'sm',
-                wrap: true,
-                color: '#555555'
+                "type": "text",
+                "text": "預約資訊",
+                "weight": "bold",
+                "size": "xl"
               },
               {
-                type: 'text',
-                text: '點此查看地址',
-                size: 'sm',
-                wrap: true,
-                color: '#007bff',
-                action: {
-                  type: 'uri',
-                  uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy'
+                "type": "separator",
+                "margin": "md"
+              },
+              {
+                "type": "text",
+                "text": `姓名: ${name}`,
+                "size": "md",
+                "margin": "md"
+              },
+              {
+                "type": "text",
+                "text": `電話: ${phone}`,
+                "size": "md",
+                "margin": "md"
+              },
+              {
+                "type": "text",
+                "text": `預約日期: ${date}`,
+                "size": "md",
+                "margin": "md"
+              },
+              {
+                "type": "text",
+                "text": `預約時段: ${time}`,
+                "size": "md",
+                "margin": "md"
+              },
+              {
+                "type": "text",
+                "text": `生日月份: ${birthdayMonth}`,
+                "size": "md",
+                "margin": "md"
+              },
+              {
+                "type": "text",
+                "text": `來源: ${referralSource}`,
+                "size": "md",
+                "margin": "md"
+              },
+              {
+                "type": "text",
+                "text": `預約項目: ${services}`,
+                "size": "md",
+                "margin": "md"
+              }
+            ]
+          },
+          "footer": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "button",
+                "style": "primary",
+                "action": {
+                  "type": "uri",
+                  "label": "回到首頁",
+                  "uri": "https://your-homepage-url.com" // 替換為您的首頁 URL
                 }
               }
             ]
@@ -153,11 +198,10 @@
         }
       };
 
-      liff.sendMessages([flexMessage]).then(() => {
-        alert('預約已送出，請等待韓哥審核！');
-        liff.closeWindow();
-      }).catch(error => console.error('Error sending message:', error));
-    });
-  </script>
-</body>
-</html>
+      // 發送 Flex Message
+      liff.sendMessages([message]).then(() => {
+        alert('預約資訊已發送！');
+        window.location.reload(); // 預約送出後重新載入頁面
+      }).catch((err) => {
+        console.error(err);
+        alert('發送失敗，請重試
