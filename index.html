@@ -113,61 +113,51 @@
       const services = Array.from(document.getElementById('service').selectedOptions).map(option => option.value).join(', ');
 
       const flexMessage = {
-  type: 'flex',
-  altText: '預約資料通知',
-  contents: {
-    type: 'bubble',
-    styles: {
-      header: { backgroundColor: '#00BFFF' },
-      body: { backgroundColor: '#F8F8F8' }
-    },
-    header: {
-      type: 'box',
-      layout: 'vertical',
-      contents: [
-        { type: 'text', text: '預約資料通知', weight: 'bold', color: '#FFFFFF', size: 'lg' }
-      ]
-    },
-    body: {
-      type: 'box',
-      layout: 'vertical',
-      contents: [
-        { type: 'text', text: `名字: ${name}`, size: 'md', color: '#333333' },
-        { type: 'text', text: `電話: ${phone}`, size: 'md', color: '#333333' },
-        { type: 'text', text: `預約日期: ${date}`, size: 'md', color: '#333333' },
-        { type: 'text', text: `預約時段: ${time}`, size: 'md', color: '#333333' },
-        { type: 'text', text: `生日月份: ${birthdayMonth}月`, size: 'md', color: '#333333' },
-        { type: 'text', text: `來源: ${referralSource}`, size: 'md', color: '#333333' },
-        { type: 'text', text: `預約項目: ${services}`, size: 'md', color: '#333333' },
-        { type: 'text', text: '（請等待韓哥審核並通知）', size: 'sm', color: '#999999', wrap: true },
-        {
-          type: 'box',
-          layout: 'vertical',
-          contents: [
-            {
-              type: 'text',
-              text: 'Hange韓哥服務地址：',
-              size: 'sm',
-              color: '#555555'
-            },
-            {
-              type: 'text',
-              text: '點此查看地址',
-              size: 'sm',
-              color: '#007bff',
-              action: {
-                type: 'uri',
-                uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy'
+        type: 'flex',
+        altText: '預約資料通知',
+        contents: {
+          type: 'bubble',
+          body: {
+            type: 'box',
+            layout: 'vertical',
+            contents: [
+              { type: 'text', text: '預約資料如下', weight: 'bold', size: 'lg' },
+              { type: 'text', text: `名字: ${name}`, size: 'md', wrap: true },
+              { type: 'text', text: `電話: ${phone}`, size: 'md', wrap: true },
+              { type: 'text', text: `預約日期: ${date}`, size: 'md', wrap: true },
+              { type: 'text', text: `預約時段: ${time}`, size: 'md', wrap: true },
+              { type: 'text', text: `生日月份: ${birthdayMonth}月`, size: 'md', wrap: true },
+              { type: 'text', text: `來源: ${referralSource}`, size: 'md', wrap: true },
+              { type: 'text', text: `預約項目: ${services}`, size: 'md', wrap: true },
+              { type: 'text', text: '（請等待韓哥審核並通知）', size: 'md', wrap: true },
+              {
+                type: 'text',
+                text: 'Hange韓哥服務地址：',
+                size: 'sm',
+                wrap: true,
+                color: '#555555'
+              },
+              {
+                type: 'text',
+                text: '點此查看地址',
+                size: 'sm',
+                wrap: true,
+                color: '#007bff',
+                action: {
+                  type: 'uri',
+                  uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy'
+                }
               }
-            }
-          ]
+            ]
+          }
         }
-      ]
-    }
-  }
-};
+      };
 
-liff.sendMessages([flexMessage]).then(() => {
-  alert('預約已送出，請等待韓哥審核！');
-  liff.closeWindow();
-}).catch(error => console.error('Error sending message:', error));
+      liff.sendMessages([flexMessage]).then(() => {
+        alert('預約已送出，請等待韓哥審核！');
+        liff.closeWindow();
+      }).catch(error => console.error('Error sending message:', error));
+    });
+  </script>
+</body>
+</html>
