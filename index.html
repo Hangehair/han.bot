@@ -115,40 +115,49 @@
         }
 
         const flexMessage = {
-  type: 'flex',
-  altText: '預約資料通知',
-  contents: {
-    type: 'bubble',
-    body: {
-      type: 'box',
-      layout: 'vertical',
-      contents: [
-        { type: 'text', text: '預約資料如下', weight: 'bold', size: 'lg' },
-        { type: 'text', text: `名字: ${name}`, size: 'md', wrap: true },
-        { type: 'text', text: `電話: ${phone}`, size: 'md', wrap: true },
-        { type: 'text', text: `預約日期: ${date}`, size: 'md', wrap: true },
-        { type: 'text', text: `預約時段: ${time}`, size: 'md', wrap: true },
-        { type: 'text', text: `生日月份: ${birthdayMonth}月`, size: 'md', wrap: true },
-        { type: 'text', text: `來源: ${referralSource}`, size: 'md', wrap: true },
-        { type: 'text', text: `預約項目: ${services}`, size: 'md', wrap: true },
-        { type: 'text', text: '（請等待韓哥審核並通知）', size: 'sm', wrap: true, color: '#999999' },
-        {
-          type: 'text',
-          text: 'Hange韓哥服務地址：點此查看地址',
-          size: 'sm',
-          wrap: true,
-          color: '#007bff',
-          action: {
-            type: 'uri',
-            uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy'
+          type: 'flex',
+          altText: '預約資料通知',
+          contents: {
+            type: 'bubble',
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                { type: 'text', text: '預約資料如下', weight: 'bold', size: 'lg' },
+                { type: 'text', text: `名字: ${name}`, size: 'md', wrap: true },
+                { type: 'text', text: `電話: ${phone}`, size: 'md', wrap: true },
+                { type: 'text', text: `預約日期: ${date}`, size: 'md', wrap: true },
+                { type: 'text', text: `預約時段: ${time}`, size: 'md', wrap: true },
+                { type: 'text', text: `預約項目: ${services}`, size: 'md', wrap: true },
+                { type: 'text', text: '（請等待韓哥審核並通知）', size: 'sm', wrap: true, color: '#999999' },
+                {
+                  type: 'text',
+                  text: 'Hange韓哥服務地址：點此查看地址',
+                  size: 'sm',
+                  wrap: true,
+                  color: '#007bff',
+                  action: {
+                    type: 'uri',
+                    label: '查看地址',
+                    uri: 'https://www.google.com/maps?q=Hange韓哥地址'
+                  }
+                }
+              ]
+            }
           }
-        }
-      ]
-    }
-  }
-};
+        };
 
-liff.sendMessages([flexMessage]).then(() => {
-  alert('預約已送出，請等待韓哥審核！');
-  liff.closeWindow();
-}).catch(error => console.error('Error sending message:', error));
+        liff.sendMessages([flexMessage])
+          .then(() => {
+            alert('預約資料已送出，請等待確認！');
+            document.getElementById('bookingForm').reset();
+          })
+          .catch((error) => {
+            alert('發送訊息失敗，請稍後再試！');
+            console.error('Error sending message:', error);
+          });
+      });
+    });
+  </script>
+</body>
+</html>
