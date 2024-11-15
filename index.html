@@ -26,7 +26,7 @@
       <input type="text" id="name" placeholder="名字" required>
 
       <label for="phone">2.電話：</label>
-      <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
+      <input type="tel" id="phone" maxlength="10" placeholder="09XXXXXXXX" value="09" required>
 
       <label for="date">3.預約日期：</label>
       <input type="date" id="date" placeholder="請選擇預約日期" required>
@@ -61,20 +61,17 @@
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const today = new Date().toISOString().split('T')[0];
-      const customHolidays = ["11/19", "12/25"]; // 自定義無法預約的日期
-
       document.getElementById('date').setAttribute('min', today);
 
       document.getElementById('date').addEventListener('change', function () {
         const selectedDate = new Date(this.value);
-        const formattedDate = `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}`;
-
-        if (selectedDate.getDay() === 1 || customHolidays.includes(formattedDate)) {
-          alert(`${formattedDate} 無法預約，請選擇其他日期！`);
+        if (selectedDate.getDay() === 1) {
+          alert('星期一無法預約，請選擇其他日期！');
           this.value = '';
         }
       });
 
+      // 預約項目複選邏輯
       const serviceOptions = document.querySelectorAll('#serviceOptions button');
       const selectedServices = new Set();
 
@@ -91,17 +88,12 @@
         });
       });
 
-      // Initialize LIFF
-      liff.init({ liffId: "2006300099-OLXDXZlb" })
-        .then(() => {
-          return liff.getProfile();
-        })
-        .then(profile => {
-          document.getElementById('name').value = profile.displayName || '';
-        })
-        .catch(err => console.error('Error initializing LIFF or fetching profile:', err));
+      liff.init({ liffId: "2006300099-OLXDXZlb" }).then(() => {
+        liff.getProfile().then(profile => {
+          document.getElementById('name').value = profile.displayName;
+        });
+      }).catch(err => console.error(err));
 
-      // Handle form submission
       document.getElementById('bookingForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
@@ -116,10 +108,49 @@
           return;
         }
 
-        // Display booking details
-        alert(`預約成功！\n\n姓名: ${name}\n電話: ${phone}\n預約日期: ${date}\n預約時段: ${time}\n預約項目: ${services}`);
-        
-        // You can add more actions here (e.g., sending this data to LINE, Firebase, etc.)
+        const flexMessage = {
+          type: 'flex',
+          altText: '預約資料通知',
+          contents: {
+            type: 'bubble',
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                { type: 'text', text: '預約資料如下', weight: 'bold', size: 'lg' },
+                { type: 'text', text: `名字: ${name}`, size: 'md', wrap: true },
+                { type: 'text', text: `電話: ${phone}`, size: 'md', wrap: true },
+                { type: 'text', text: `預約日期: ${date}`, size: 'md', wrap: true },
+                { type: 'text', text: `預約時段: ${time}`, size: 'md', wrap: true },
+                { type: 'text', text: `預約項目: ${services}`, size: 'md', wrap: true },
+                { type: 'text', text: '（請等待韓哥審核並通知）', size: 'md', wrap: true },
+                {
+                  type: 'text',
+                  text: 'Hange韓哥服務地址：',
+                  size: 'sm',
+                  wrap: true,
+                  color: '#555555'
+                },
+                {
+                  type: 'text',
+                  text: '點此查看地址',
+                  size: 'sm',
+                  wrap: true,
+                  color: '#007bff',
+                  action: {
+                    type: 'uri',
+                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy'
+                  }
+                }
+              ]
+            }
+          }
+        };
+
+        liff.sendMessages([flexMessage]).then(() => {
+          alert('預約已送出，請等待韓哥審核！');
+          liff.closeWindow();
+        }).catch(error => console.error('Error sending message:', error));
       });
     });
   </script>
