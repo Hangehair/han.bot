@@ -57,16 +57,19 @@
     </form>
   </div>
 
-  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const today = new Date().toISOString().split('T')[0];
+      const customHolidays = ["11/19", "11/26"]; // 手動設定不能預約的日期
+
       document.getElementById('date').setAttribute('min', today);
 
       document.getElementById('date').addEventListener('change', function () {
         const selectedDate = new Date(this.value);
-        if (selectedDate.getDay() === 1) {
-          alert('星期一無法預約，請選擇其他日期！');
+        const formattedDate = `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}`;
+
+        if (selectedDate.getDay() === 1 || customHolidays.includes(formattedDate)) {
+          alert(`${formattedDate} 無法預約，請選擇其他日期！`);
           this.value = '';
         }
       });
@@ -88,12 +91,6 @@
         });
       });
 
-      liff.init({ liffId: "2006300099-OLXDXZlb" }).then(() => {
-        liff.getProfile().then(profile => {
-          document.getElementById('name').value = profile.displayName;
-        });
-      }).catch(err => console.error(err));
-
       document.getElementById('bookingForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
@@ -108,49 +105,9 @@
           return;
         }
 
-        const flexMessage = {
-          type: 'flex',
-          altText: '預約資料通知',
-          contents: {
-            type: 'bubble',
-            body: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                { type: 'text', text: '預約資料如下', weight: 'bold', size: 'lg' },
-                { type: 'text', text: `名字: ${name}`, size: 'md', wrap: true },
-                { type: 'text', text: `電話: ${phone}`, size: 'md', wrap: true },
-                { type: 'text', text: `預約日期: ${date}`, size: 'md', wrap: true },
-                { type: 'text', text: `預約時段: ${time}`, size: 'md', wrap: true },
-                { type: 'text', text: `預約項目: ${services}`, size: 'md', wrap: true },
-                { type: 'text', text: '（請等待韓哥審核並通知）', size: 'md', wrap: true },
-                {
-                  type: 'text',
-                  text: 'Hange韓哥服務地址：',
-                  size: 'sm',
-                  wrap: true,
-                  color: '#555555'
-                },
-                {
-                  type: 'text',
-                  text: '點此查看地址',
-                  size: 'sm',
-                  wrap: true,
-                  color: '#007bff',
-                  action: {
-                    type: 'uri',
-                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy'
-                  }
-                }
-              ]
-            }
-          }
-        };
-
-        liff.sendMessages([flexMessage]).then(() => {
-          alert('預約已送出，請等待韓哥審核！');
-          liff.closeWindow();
-        }).catch(error => console.error('Error sending message:', error));
+        // 將資料傳到確認頁面
+        const queryParams = new URLSearchParams({ name, phone, date, time, services });
+        window.location.href = `confirmation.html?${queryParams.toString()}`;
       });
     });
   </script>
