@@ -114,17 +114,59 @@
           return;
         }
 
-        const message = `
-          預約資料如下：
-          名字: ${name}
-          電話: ${phone}
-          預約日期: ${date}
-          預約時段: ${time}
-          預約項目: ${services}
-          （請等待韓哥審核並通知）
-        `;
+        const flexMessage = {
+          type: 'flex',
+          altText: '預約資料',
+          contents: {
+            type: 'bubble',
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'text',
+                  text: '預約資料如下：',
+                  weight: 'bold',
+                  size: 'lg'
+                },
+                {
+                  type: 'text',
+                  text: `名字: ${name}`,
+                  margin: 'md'
+                },
+                {
+                  type: 'text',
+                  text: `電話: ${phone}`,
+                  margin: 'md'
+                },
+                {
+                  type: 'text',
+                  text: `預約日期: ${date}`,
+                  margin: 'md'
+                },
+                {
+                  type: 'text',
+                  text: `預約時段: ${time}`,
+                  margin: 'md'
+                },
+                {
+                  type: 'text',
+                  text: `預約項目: ${services}`,
+                  margin: 'md'
+                },
+                {
+                  type: 'text',
+                  text: '（請等待韓哥審核並通知）',
+                  margin: 'md',
+                  size: 'sm',
+                  color: '#888'
+                }
+              ]
+            }
+          }
+        };
 
-        liff.sendMessages([{ type: 'text', text: message }])
+        liff.sendMessages([flexMessage])
           .then(() => {
             alert('預約已送出！感謝您的支持！');
             liff.closeWindow();
