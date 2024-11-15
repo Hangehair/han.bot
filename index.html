@@ -26,7 +26,7 @@
       <input type="text" id="name" placeholder="名字" required>
 
       <label for="phone">2.電話：</label>
-      <input type="tel" id="phone" maxlength="10" placeholder="09XXXXXXXX" value="09" required>
+      <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
 
       <label for="date">3.預約日期：</label>
       <input type="date" id="date" placeholder="請選擇預約日期" required>
@@ -57,10 +57,11 @@
     </form>
   </div>
 
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const today = new Date().toISOString().split('T')[0];
-      const customHolidays = ["11/19", "11/26"]; // 手動設定不能預約的日期
+      const customHolidays = ["11/19", "12/25"]; // 自定義無法預約的日期
 
       document.getElementById('date').setAttribute('min', today);
 
@@ -74,7 +75,6 @@
         }
       });
 
-      // 預約項目複選邏輯
       const serviceOptions = document.querySelectorAll('#serviceOptions button');
       const selectedServices = new Set();
 
@@ -91,6 +91,15 @@
         });
       });
 
+      liff.init({ liffId: "2006300099-OLXDXZlb" })
+        .then(() => {
+          return liff.getProfile();
+        })
+        .then(profile => {
+          document.getElementById('name').value = profile.displayName || '';
+        })
+        .catch(err => console.error('Error initializing LIFF or fetching profile:', err));
+
       document.getElementById('bookingForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
@@ -105,9 +114,22 @@
           return;
         }
 
-        // 將資料傳到確認頁面
-        const queryParams = new URLSearchParams({ name, phone, date, time, services });
-        window.location.href = `confirmation.html?${queryParams.toString()}`;
+        const message = `
+          預約資料如下：
+          名字: ${name}
+          電話: ${phone}
+          預約日期: ${date}
+          預約時段: ${time}
+          預約項目: ${services}
+          （請等待韓哥審核並通知）
+        `;
+
+        liff.sendMessages([{ type: 'text', text: message }])
+          .then(() => {
+            alert('預約已送出！感謝您的支持！');
+            liff.closeWindow();
+          })
+          .catch(err => console.error('Error sending message:', err));
       });
     });
   </script>
