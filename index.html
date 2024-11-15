@@ -12,6 +12,11 @@
     input, select, button { padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; text-align: center; width: 100%; box-sizing: border-box; }
     button { background-color: #007bff; color: white; cursor: pointer; }
     button:hover { background-color: #0056b3; }
+    .multi-select { display: flex; flex-wrap: wrap; gap: 10px; }
+    .multi-select button { padding: 10px; border: 1px solid #007bff; background-color: #fff; color: #007bff; cursor: pointer; flex: 1 1 calc(50% - 10px); text-align: center; }
+    .multi-select button.selected { background-color: #007bff; color: #fff; }
+    .multi-select button:hover { background-color: #0056b3; color: white; }
+    .note { font-size: 12px; color: #666; }
   </style>
 </head>
 <body>
@@ -21,7 +26,7 @@
       <input type="text" id="name" placeholder="名字" required>
 
       <label for="phone">2.電話：</label>
-      <input type="tel" id="phone" placeholder="電話" required>
+      <input type="tel" id="phone" maxlength="10" placeholder="09XXXXXXXX" value="09" required>
 
       <label for="date">3.預約日期：</label>
       <input type="date" id="date" placeholder="請選擇預約日期" required>
@@ -36,43 +41,17 @@
         <option value="17:00">17:00</option>
       </select>
 
-      <label for="birthdayMonth">5.生日月份：</label>
-      <select id="birthdayMonth" required>
-        <option value="" disabled selected>請選擇生日月份</option>
-        <option value="1">1月</option>
-        <option value="2">2月</option>
-        <option value="3">3月</option>
-        <option value="4">4月</option>
-        <option value="5">5月</option>
-        <option value="6">6月</option>
-        <option value="7">7月</option>
-        <option value="8">8月</option>
-        <option value="9">9月</option>
-        <option value="10">10月</option>
-        <option value="11">11月</option>
-        <option value="12">12月</option>
-      </select>
-
-      <label for="referralSource">6.哪邊知道韓哥：</label>
-      <select id="referralSource" required>
-        <option value="" disabled selected>請選擇</option>
-        <option value="Google搜尋">Google搜尋</option>
-        <option value="FB">FB</option>
-        <option value="IG">IG</option>
-        <option value="朋友介紹">朋友介紹</option>
-        <option value="預約整理">預約整理</option>
-      </select>
-
-      <label for="service">7.預約項目：</label>
-      <select id="service" multiple required>
-        <option value="接髮">接髮</option>
-        <option value="染髮">染髮</option>
-        <option value="燙髮">燙髮</option>
-        <option value="剪髮">剪髮</option>
-        <option value="洗髮">洗髮</option>
-        <option value="頭髮護理">頭髮護理</option>
-        <option value="頭皮護理">頭皮護理</option>
-      </select>
+      <label>5.預約項目：</label>
+      <div class="multi-select" id="serviceOptions">
+        <button type="button" data-value="接髮">接髮</button>
+        <button type="button" data-value="染髮">染髮</button>
+        <button type="button" data-value="燙髮">燙髮</button>
+        <button type="button" data-value="剪髮">剪髮</button>
+        <button type="button" data-value="洗髮">洗髮</button>
+        <button type="button" data-value="頭髮護理">頭髮護理</button>
+        <button type="button" data-value="頭皮護理">頭皮護理</button>
+      </div>
+      <span class="note">* 可複選多個項目</span>
 
       <button type="submit">送出預約</button>
     </form>
@@ -92,71 +71,87 @@
         }
       });
 
+      // 預約項目複選邏輯
+      const serviceOptions = document.querySelectorAll('#serviceOptions button');
+      const selectedServices = new Set();
+
+      serviceOptions.forEach(option => {
+        option.addEventListener('click', function () {
+          const value = this.getAttribute('data-value');
+          if (selectedServices.has(value)) {
+            selectedServices.delete(value);
+            this.classList.remove('selected');
+          } else {
+            selectedServices.add(value);
+            this.classList.add('selected');
+          }
+        });
+      });
+
       liff.init({ liffId: "2006300099-OLXDXZlb" }).then(() => {
         liff.getProfile().then(profile => {
           document.getElementById('name').value = profile.displayName;
         });
-        liff.getDecodedIDToken().then(idToken => {
-          document.getElementById('phone').value = idToken.sub;
-        });
       }).catch(err => console.error(err));
-    });
 
-    document.getElementById('bookingForm').addEventListener('submit', function (event) {
-      event.preventDefault();
-      const date = document.getElementById('date').value;
-      const time = document.getElementById('time').value;
-      const name = document.getElementById('name').value;
-      const phone = document.getElementById('phone').value;
-      const birthdayMonth = document.getElementById('birthdayMonth').value;
-      const referralSource = document.getElementById('referralSource').value;
-      const services = Array.from(document.getElementById('service').selectedOptions).map(option => option.value).join(', ');
+      document.getElementById('bookingForm').addEventListener('submit', function (event) {
+        event.preventDefault();
 
-      const flexMessage = {
-        type: 'flex',
-        altText: '預約資料通知',
-        contents: {
-          type: 'bubble',
-          body: {
-            type: 'box',
-            layout: 'vertical',
-            contents: [
-              { type: 'text', text: '預約資料如下', weight: 'bold', size: 'lg' },
-              { type: 'text', text: `名字: ${name}`, size: 'md', wrap: true },
-              { type: 'text', text: `電話: ${phone}`, size: 'md', wrap: true },
-              { type: 'text', text: `預約日期: ${date}`, size: 'md', wrap: true },
-              { type: 'text', text: `預約時段: ${time}`, size: 'md', wrap: true },
-              { type: 'text', text: `生日月份: ${birthdayMonth}月`, size: 'md', wrap: true },
-              { type: 'text', text: `來源: ${referralSource}`, size: 'md', wrap: true },
-              { type: 'text', text: `預約項目: ${services}`, size: 'md', wrap: true },
-              { type: 'text', text: '（請等待韓哥審核並通知）', size: 'md', wrap: true },
-              {
-                type: 'text',
-                text: 'Hange韓哥服務地址：',
-                size: 'sm',
-                wrap: true,
-                color: '#555555'
-              },
-              {
-                type: 'text',
-                text: '點此查看地址',
-                size: 'sm',
-                wrap: true,
-                color: '#007bff',
-                action: {
-                  type: 'uri',
-                  uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy'
-                }
-              }
-            ]
-          }
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+        const services = Array.from(selectedServices).join(', ');
+
+        if (!services) {
+          alert('請至少選擇一個預約項目！');
+          return;
         }
-      };
 
-      liff.sendMessages([flexMessage]).then(() => {
-        alert('預約已送出，請等待韓哥審核！');
-        liff.closeWindow();
-      }).catch(error => console.error('Error sending message:', error));
+        const flexMessage = {
+          type: 'flex',
+          altText: '預約資料通知',
+          contents: {
+            type: 'bubble',
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                { type: 'text', text: '預約資料如下', weight: 'bold', size: 'lg' },
+                { type: 'text', text: `名字: ${name}`, size: 'md', wrap: true },
+                { type: 'text', text: `電話: ${phone}`, size: 'md', wrap: true },
+                { type: 'text', text: `預約日期: ${date}`, size: 'md', wrap: true },
+                { type: 'text', text: `預約時段: ${time}`, size: 'md', wrap: true },
+                { type: 'text', text: `預約項目: ${services}`, size: 'md', wrap: true },
+                { type: 'text', text: '（請等待韓哥審核並通知）', size: 'md', wrap: true },
+                {
+                  type: 'text',
+                  text: 'Hange韓哥服務地址：',
+                  size: 'sm',
+                  wrap: true,
+                  color: '#555555'
+                },
+                {
+                  type: 'text',
+                  text: '點此查看地址',
+                  size: 'sm',
+                  wrap: true,
+                  color: '#007bff',
+                  action: {
+                    type: 'uri',
+                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy'
+                  }
+                }
+              ]
+            }
+          }
+        };
+
+        liff.sendMessages([flexMessage]).then(() => {
+          alert('預約已送出，請等待韓哥審核！');
+          liff.closeWindow();
+        }).catch(error => console.error('Error sending message:', error));
+      });
     });
   </script>
 </body>
