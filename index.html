@@ -91,6 +91,7 @@
         });
       });
 
+      // Initialize LIFF
       liff.init({ liffId: "2006300099-OLXDXZlb" })
         .then(() => {
           return liff.getProfile();
@@ -100,6 +101,7 @@
         })
         .catch(err => console.error('Error initializing LIFF or fetching profile:', err));
 
+      // Handle form submission
       document.getElementById('bookingForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
@@ -114,48 +116,10 @@
           return;
         }
 
-        const flexMessage = {
-          type: 'flex',
-          altText: '預約資料通知',
-          contents: {
-            type: 'bubble',
-            body: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                { type: 'text', text: '預約資料如下', weight: 'bold', size: 'lg' },
-                { type: 'text', text: `名字: ${name}`, size: 'md', wrap: true },
-                { type: 'text', text: `電話: ${phone}`, size: 'md', wrap: true },
-                { type: 'text', text: `預約日期: ${date}`, size: 'md', wrap: true },
-                { type: 'text', text: `預約時段: ${time}`, size: 'md', wrap: true },
-                { type: 'text', text: `預約項目: ${services}`, size: 'md', wrap: true },
-                { type: 'text', text: '（請等待韓哥審核並通知）', size: 'sm', wrap: true, color: '#999999' },
-                {
-                  type: 'text',
-                  text: 'Hange韓哥服務地址：點此查看地址',
-                  size: 'sm',
-                  wrap: true,
-                  color: '#007bff',
-                  action: {
-                    type: 'uri',
-                    label: '查看地址',
-                    uri: 'https://www.google.com/maps?q=Hange韓哥地址'
-                  }
-                }
-              ]
-            }
-          }
-        };
-
-        liff.sendMessages([flexMessage])
-          .then(() => {
-            alert('預約資料已送出，請等待確認！');
-            document.getElementById('bookingForm').reset();
-          })
-          .catch((error) => {
-            alert('發送訊息失敗，請稍後再試！');
-            console.error('Error sending message:', error);
-          });
+        // Display booking details
+        alert(`預約成功！\n\n姓名: ${name}\n電話: ${phone}\n預約日期: ${date}\n預約時段: ${time}\n預約項目: ${services}`);
+        
+        // You can add more actions here (e.g., sending this data to LINE, Firebase, etc.)
       });
     });
   </script>
