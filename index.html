@@ -22,26 +22,7 @@
 <body>
   <div class="container">
     <form id="bookingForm">
-      <label for="name">1.姓名：</label>
-      <input type="text" id="name" placeholder="名字" required>
-
-      <label for="phone">2.電話：</label>
-      <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
-
-      <label for="date">3.預約日期：</label>
-      <input type="date" id="date" placeholder="請選擇預約日期" required>
-
-      <label for="time">4.預約時段：</label>
-      <select id="time" required>
-        <option value="" disabled selected>請選擇預約時段</option>
-        <option value="13:00">13:00</option>
-        <option value="14:00">14:00</option>
-        <option value="15:00">15:00</option>
-        <option value="16:00">16:00</option>
-        <option value="17:00">17:00</option>
-      </select>
-
-      <label>5.預約項目：</label>
+      <label>1.預約項目：</label>
       <div class="multi-select" id="serviceOptions">
         <button type="button" data-value="接髮">接髮</button>
         <button type="button" data-value="染髮">染髮</button>
@@ -53,6 +34,25 @@
       </div>
       <span class="note">* 可複選多個項目</span>
 
+      <label for="name">2.姓名：</label>
+      <input type="text" id="name" placeholder="名字" required>
+
+      <label for="phone">3.電話：</label>
+      <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
+
+      <label for="date">4.預約日期：</label>
+      <input type="date" id="date" placeholder="請選擇預約日期" required>
+
+      <label for="time">5.預約時段：</label>
+      <select id="time" required>
+        <option value="" disabled selected>請選擇預約時段</option>
+        <option value="13:00">13:00</option>
+        <option value="14:00">14:00</option>
+        <option value="15:00">15:00</option>
+        <option value="16:00">16:00</option>
+        <option value="17:00">17:00</option>
+      </select>
+
       <button type="submit">送出預約</button>
     </form>
   </div>
@@ -60,16 +60,18 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const today = new Date().toISOString().split('T')[0];
-      const customHolidays = ["11/19", "12/25"]; // 自定義無法預約的日期
+      const today = new Date();
+      const formattedToday = today.toISOString().split('T')[0];
+      const customHolidays = ["11/19", "12/25", "1/1", "2/14", "3/8", "4/4", "5/1", "6/6", "7/7", "8/8"]; // 可自定義的無法預約日期
 
-      document.getElementById('date').setAttribute('min', today);
+      document.getElementById('date').setAttribute('min', formattedToday);
 
       document.getElementById('date').addEventListener('change', function () {
         const selectedDate = new Date(this.value);
         const formattedDate = `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}`;
 
-        if (selectedDate.getDay() === 1 || customHolidays.includes(formattedDate)) {
+        // 當天無法預約或自定義假日
+        if (selectedDate.getTime() <= today.getTime() || customHolidays.includes(formattedDate)) {
           alert(`${formattedDate} 無法預約，請選擇其他日期！`);
           this.value = '';
         }
@@ -123,36 +125,40 @@
               type: 'box',
               layout: 'vertical',
               contents: [
-                { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'sm' },
+                { type: 'text', text: '預約成功通知', weight: 'bold', color: '#1DB446', size: 'sm' },
                 { type: 'text', text: 'Hange 韓哥接髮專家', weight: 'bold', size: 'xxl', margin: 'md' },
-                { type: 'text', text: '台北市西門町', size: 'xs', color: '#aaaaaa', wrap: true },
+                { type: 'separator', margin: 'xxl' },
+                { type: 'text', text: `預約項目: ${services}`, size: 'sm', color: '#555555', margin: 'sm' },
+                { type: 'text', text: `預約日期: ${date}`, size: 'sm', color: '#555555', margin: 'sm' },
+                { type: 'text', text: `預約時段: ${time}`, size: 'sm', color: '#555555', margin: 'sm' },
+                { type: 'text', text: `顧客姓名: ${name}`, size: 'sm', color: '#555555', margin: 'sm' },
+                { type: 'text', text: `顧客電話: ${phone}`, size: 'sm', color: '#555555', margin: 'sm' },
                 { type: 'separator', margin: 'xxl' },
                 {
                   type: 'box',
                   layout: 'vertical',
-                  margin: 'xxl',
                   spacing: 'sm',
                   contents: [
-                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '名字', size: 'sm', color: '#555555', flex: 0 }, { type: 'text', text: name, size: 'sm', color: '#111111', align: 'end' }] },
-                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '電話', size: 'sm', color: '#555555', flex: 0 }, { type: 'text', text: phone, size: 'sm', color: '#111111', align: 'end' }] },
-                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '預約日期', size: 'sm', color: '#555555', flex: 0 }, { type: 'text', text: date, size: 'sm', color: '#111111', align: 'end' }] },
-                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '預約時段', size: 'sm', color: '#555555', flex: 0 }, { type: 'text', text: time, size: 'sm', color: '#111111', align: 'end' }] },
-                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '項目', size: 'sm', color: '#555555', flex: 0 }, { type: 'text', text: services, size: 'sm', color: '#111111', align: 'end' }] }
-                  ]
-                },
-                { type: 'separator', margin: 'xxl' },
-                {
-                  type: 'box',
-                  layout: 'horizontal',
-                  margin: 'md',
-                  contents: [
-                    { type: 'text', text: '確認碼', size: 'xs', color: '#aaaaaa', flex: 0 },
-                    { type: 'text', text: `#${Math.floor(100000 + Math.random() * 900000)}`, color: '#aaaaaa', size: 'xs', align: 'end' }
+                    {
+                      type: 'button',
+                      style: 'primary',
+                      color: '#1DB446',
+                      action: { type: 'message', label: '確認預約', text: '您的預約已成功提交！' }
+                    },
+                    {
+                      type: 'button',
+                      style: 'primary',
+                      action: { type: 'uri', label: '查看地址', uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy' }
+                    },
+                    {
+                      type: 'button',
+                      style: 'primary',
+                      action: { type: 'uri', label: '新增至行事曆', uri: `https://calendar.google.com/calendar/r/eventedit?text=預約韓哥接髮&dates=${date.replace(/-/g, '')}T${time.replace(':', '')}00Z` }
+                    }
                   ]
                 }
               ]
-            },
-            styles: { footer: { separator: true } }
+            }
           }
         };
 
