@@ -62,7 +62,7 @@
     document.addEventListener('DOMContentLoaded', function () {
       const today = new Date();
       const formattedToday = today.toISOString().split('T')[0];
-      const customHolidays = ["11/19", "12/25", "1/1", "2/14", "3/8", "4/4", "5/1", "6/6", "7/7", "8/8"]; // 可自定義的無法預約日期
+      const customHolidays = ["11/19", "12/25", "1/1", "2/14", "3/8", "4/4", "5/1", "6/6"]; // 自定義假日
 
       document.getElementById('date').setAttribute('min', formattedToday);
 
@@ -70,8 +70,10 @@
         const selectedDate = new Date(this.value);
         const formattedDate = `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}`;
 
-        // 當天無法預約或自定義假日
-        if (selectedDate.getTime() <= today.getTime() || customHolidays.includes(formattedDate)) {
+        // 禁止當天、每週一或自定義假日預約
+        if (selectedDate.getTime() <= today.getTime() || 
+            selectedDate.getDay() === 1 || 
+            customHolidays.includes(formattedDate)) {
           alert(`${formattedDate} 無法預約，請選擇其他日期！`);
           this.value = '';
         }
@@ -121,42 +123,30 @@
           altText: '預約成功通知',
           contents: {
             type: 'bubble',
+            header: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                { type: 'text', text: `預約項目：${services}`, weight: 'bold', size: 'lg', color: '#007bff' }
+              ]
+            },
             body: {
               type: 'box',
               layout: 'vertical',
               contents: [
-                { type: 'text', text: '預約成功通知', weight: 'bold', color: '#1DB446', size: 'sm' },
-                { type: 'text', text: 'Hange 韓哥接髮專家', weight: 'bold', size: 'xxl', margin: 'md' },
-                { type: 'separator', margin: 'xxl' },
-                { type: 'text', text: `預約項目: ${services}`, size: 'sm', color: '#555555', margin: 'sm' },
-                { type: 'text', text: `預約日期: ${date}`, size: 'sm', color: '#555555', margin: 'sm' },
-                { type: 'text', text: `預約時段: ${time}`, size: 'sm', color: '#555555', margin: 'sm' },
-                { type: 'text', text: `顧客姓名: ${name}`, size: 'sm', color: '#555555', margin: 'sm' },
-                { type: 'text', text: `顧客電話: ${phone}`, size: 'sm', color: '#555555', margin: 'sm' },
-                { type: 'separator', margin: 'xxl' },
-                {
-                  type: 'box',
-                  layout: 'vertical',
-                  spacing: 'sm',
-                  contents: [
-                    {
-                      type: 'button',
-                      style: 'primary',
-                      color: '#1DB446',
-                      action: { type: 'message', label: '確認預約', text: '您的預約已成功提交！' }
-                    },
-                    {
-                      type: 'button',
-                      style: 'primary',
-                      action: { type: 'uri', label: '查看地址', uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9?g_st=com.google.maps.preview.copy' }
-                    },
-                    {
-                      type: 'button',
-                      style: 'primary',
-                      action: { type: 'uri', label: '新增至行事曆', uri: `https://calendar.google.com/calendar/r/eventedit?text=預約韓哥接髮&dates=${date.replace(/-/g, '')}T${time.replace(':', '')}00Z` }
-                    }
-                  ]
-                }
+                { type: 'text', text: `顧客姓名: ${name}`, size: 'md', color: '#333333' },
+                { type: 'text', text: `電話: ${phone}`, size: 'md', color: '#333333' },
+                { type: 'text', text: `日期: ${date}`, size: 'md', color: '#333333' },
+                { type: 'text', text: `時段: ${time}`, size: 'md', color: '#333333' }
+              ]
+            },
+            footer: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                { type: 'button', style: 'primary', action: { type: 'message', label: '確認預約', text: '您的預約已成功提交！' } },
+                { type: 'button', style: 'primary', action: { type: 'uri', label: '查看地址', uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9' } },
+                { type: 'button', style: 'primary', action: { type: 'uri', label: '新增至行事曆', uri: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=預約韓哥接髮&dates=${date}T${time.replace(':', '')}00Z/${date}T${time.replace(':', '')}59Z&details=韓哥接髮專家預約&location=台北市西門町` } }
               ]
             }
           }
