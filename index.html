@@ -22,7 +22,26 @@
 <body>
   <div class="container">
     <form id="bookingForm">
-      <label>1.預約項目：</label>
+      <label for="name">1.姓名：</label>
+      <input type="text" id="name" placeholder="名字" required>
+
+      <label for="phone">2.電話：</label>
+      <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
+
+      <label for="date">3.預約日期：</label>
+      <input type="date" id="date" placeholder="請選擇預約日期" required>
+
+      <label for="time">4.預約時段：</label>
+      <select id="time" required>
+        <option value="" disabled selected>請選擇預約時段</option>
+        <option value="13:00">13:00</option>
+        <option value="14:00">14:00</option>
+        <option value="15:00">15:00</option>
+        <option value="16:00">16:00</option>
+        <option value="17:00">17:00</option>
+      </select>
+
+      <label>5.預約項目：</label>
       <div class="multi-select" id="serviceOptions">
         <button type="button" data-value="接髮">接髮</button>
         <button type="button" data-value="染髮">染髮</button>
@@ -33,25 +52,6 @@
         <button type="button" data-value="頭皮護理">頭皮護理</button>
       </div>
       <span class="note">* 可複選多個項目</span>
-
-      <label for="name">2.姓名：</label>
-      <input type="text" id="name" placeholder="名字" required>
-
-      <label for="phone">3.電話：</label>
-      <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
-
-      <label for="date">4.預約日期：</label>
-      <input type="date" id="date" placeholder="請選擇預約日期" required>
-
-      <label for="time">5.預約時段：</label>
-      <select id="time" required>
-        <option value="" disabled selected>請選擇預約時段</option>
-        <option value="13:00">13:00</option>
-        <option value="14:00">14:00</option>
-        <option value="15:00">15:00</option>
-        <option value="16:00">16:00</option>
-        <option value="17:00">17:00</option>
-      </select>
 
       <button type="submit">送出預約</button>
     </form>
@@ -70,7 +70,6 @@
         const selectedDate = new Date(this.value);
         const formattedDate = `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}`;
 
-        // 禁止當天、每週一或自定義假日預約
         if (selectedDate.getTime() <= today.getTime() || 
             selectedDate.getDay() === 1 || 
             customHolidays.includes(formattedDate)) {
@@ -123,30 +122,37 @@
           altText: '預約成功通知',
           contents: {
             type: 'bubble',
-            header: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                { type: 'text', text: `預約項目：${services}`, weight: 'bold', size: 'lg', color: '#007bff' }
-              ]
-            },
             body: {
               type: 'box',
               layout: 'vertical',
               contents: [
-                { type: 'text', text: `顧客姓名: ${name}`, size: 'md', color: '#333333' },
-                { type: 'text', text: `電話: ${phone}`, size: 'md', color: '#333333' },
-                { type: 'text', text: `日期: ${date}`, size: 'md', color: '#333333' },
-                { type: 'text', text: `時段: ${time}`, size: 'md', color: '#333333' }
-              ]
-            },
-            footer: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                { type: 'button', style: 'primary', action: { type: 'message', label: '確認預約', text: '您的預約已成功提交！' } },
-                { type: 'button', style: 'primary', action: { type: 'uri', label: '查看地址', uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9' } },
-                { type: 'button', style: 'primary', action: { type: 'uri', label: '新增至行事曆', uri: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=預約韓哥接髮&dates=${date}T${time.replace(':', '')}00Z/${date}T${time.replace(':', '')}59Z&details=韓哥接髮專家預約&location=台北市西門町` } }
+                { type: 'text', text: 'RECEIPT', weight: 'bold', color: '#1DB446', size: 'sm' },
+                { type: 'text', text: 'Hange 韓哥接髮專家', weight: 'bold', size: 'xxl', margin: 'md' },
+                { type: 'text', text: '台北市西門町', size: 'xs', color: '#aaaaaa', wrap: true },
+                { type: 'separator', margin: 'xxl' },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  margin: 'xxl',
+                  spacing: 'sm',
+                  contents: [
+                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '顧客姓名', size: 'sm', color: '#555555' }, { type: 'text', text: name, size: 'sm', color: '#111111', align: 'end' }] },
+                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '電話', size: 'sm', color: '#555555' }, { type: 'text', text: phone, size: 'sm', color: '#111111', align: 'end' }] },
+                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '日期', size: 'sm', color: '#555555' }, { type: 'text', text: date, size: 'sm', color: '#111111', align: 'end' }] },
+                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '時段', size: 'sm', color: '#555555' }, { type: 'text', text: time, size: 'sm', color: '#111111', align: 'end' }] },
+                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '項目', size: 'sm', color: '#555555' }, { type: 'text', text: services, size: 'sm', color: '#111111', align: 'end' }] }
+                  ]
+                },
+                { type: 'separator', margin: 'xxl' },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  contents: [
+                    { type: 'button', style: 'primary', action: { type: 'message', label: '確認預約', text: '您的預約已成功提交！' } },
+                    { type: 'button', style: 'primary', action: { type: 'uri', label: '查看地址', uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9' } },
+                    { type: 'button', style: 'primary', action: { type: 'uri', label: '新增至行事曆', uri: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=預約韓哥接髮&dates=${date}T${time.replace(':', '')}00Z/${date}T${time.replace(':', '')}59Z&details=韓哥接髮專家預約&location=台北市西門町` } }
+                  ]
+                }
               ]
             }
           }
