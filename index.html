@@ -123,36 +123,15 @@
               type: 'box',
               layout: 'vertical',
               contents: [
-                { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'sm' },
-                { type: 'text', text: 'Hange 韓哥接髮專家', weight: 'bold', size: 'xxl', margin: 'md' },
-                { type: 'text', text: '台北市西門町', size: 'xs', color: '#aaaaaa', wrap: true },
+                { type: 'text', text: '台北市西門町Hange韓哥接髮專家', weight: 'bold', size: 'md', color: '#333333' },
+                { type: 'text', text: `項目: ${services}`, weight: 'bold', size: 'sm', color: '#007bff', margin: 'md' },
                 { type: 'separator', margin: 'xxl' },
-                {
-                  type: 'box',
-                  layout: 'vertical',
-                  margin: 'xxl',
-                  spacing: 'sm',
-                  contents: [
-                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '名字', size: 'sm', color: '#555555', flex: 0 }, { type: 'text', text: name, size: 'sm', color: '#111111', align: 'end' }] },
-                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '電話', size: 'sm', color: '#555555', flex: 0 }, { type: 'text', text: phone, size: 'sm', color: '#111111', align: 'end' }] },
-                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '預約日期', size: 'sm', color: '#555555', flex: 0 }, { type: 'text', text: date, size: 'sm', color: '#111111', align: 'end' }] },
-                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '預約時段', size: 'sm', color: '#555555', flex: 0 }, { type: 'text', text: time, size: 'sm', color: '#111111', align: 'end' }] },
-                    { type: 'box', layout: 'horizontal', contents: [{ type: 'text', text: '項目', size: 'sm', color: '#555555', flex: 0 }, { type: 'text', text: services, size: 'sm', color: '#111111', align: 'end' }] }
-                  ]
-                },
-                { type: 'separator', margin: 'xxl' },
-                {
-                  type: 'box',
-                  layout: 'horizontal',
-                  margin: 'md',
-                  contents: [
-                    { type: 'text', text: '確認碼', size: 'xs', color: '#aaaaaa', flex: 0 },
-                    { type: 'text', text: `#${Math.floor(100000 + Math.random() * 900000)}`, color: '#aaaaaa', size: 'xs', align: 'end' }
-                  ]
-                }
+                { type: 'text', text: `名字: ${name}`, size: 'md', color: '#333333' },
+                { type: 'text', text: `電話: ${phone}`, size: 'md', color: '#333333' },
+                { type: 'text', text: `日期: ${date}`, size: 'md', color: '#333333' },
+                { type: 'text', text: `時段: ${time}`, size: 'md', color: '#333333' }
               ]
-            },
-            styles: { footer: { separator: true } }
+            }
           }
         };
 
