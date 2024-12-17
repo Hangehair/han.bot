@@ -122,14 +122,27 @@
               layout: 'vertical',
               contents: [
                 { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'sm' },
-                { type: 'text', text: `項目: ${services}`, weight: 'bold', size: 'sm', color: '#007bff' },
+                { type: 'text', text: `項目: ${services}`, weight: 'bold', size: 'lg', color: '#007bff', margin: 'md' },
                 { type: 'separator', margin: 'xxl' },
-                { type: 'text', text: `名字: ${name}`, size: 'md', color: '#333333' },
-                { type: 'text', text: `電話: ${phone}`, size: 'md', color: '#333333' },
-                { type: 'text', text: `預約日期: ${date}`, size: 'md', color: '#333333' },
-                { type: 'text', text: `預約時段: ${time}`, size: 'md', color: '#333333' },
+                { type: 'box', layout: 'horizontal', contents: [ 
+                    { type: 'text', text: '名字', size: 'md', color: '#555555', flex: 0 }, 
+                    { type: 'text', text: name, size: 'md', color: '#111111', align: 'end' } 
+                  ] 
+                },
+                { type: 'text', text: `電話: ${phone}`, size: 'md', color: '#333333', margin: 'md' },
+                { type: 'text', text: `預約日期: ${date}`, size: 'md', color: '#333333', margin: 'md' },
+                { type: 'text', text: `預約時段: ${time}`, size: 'md', color: '#333333', margin: 'md' },
                 { type: 'separator', margin: 'xxl' },
-                { type: 'text', text: '台北西門町Hange韓哥', size: 'sm', color: '#555555' }
+                { 
+                  type: 'button', 
+                  action: { 
+                    type: 'uri', 
+                    label: 'Hange韓哥地址', 
+                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
+                  },
+                  style: 'primary',
+                  color: '#007bff'
+                }
               ]
             }
           }
