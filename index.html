@@ -60,16 +60,18 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      const today = new Date().toISOString().split('T')[0];
-      const customHolidays = ["11/19", "12/25"]; // 自定義無法預約的日期
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
 
-      document.getElementById('date').setAttribute('min', today);
+      const customHolidays = ["11/19", "12/25", "07/01", "08/15", "09/09", "10/10", "01/01", "02/28", "05/01", "06/15"]; // 自定義無法預約的日期
+
+      document.getElementById('date').setAttribute('min', todayStr);
 
       document.getElementById('date').addEventListener('change', function () {
         const selectedDate = new Date(this.value);
-        const formattedDate = `${selectedDate.getMonth() + 1}/${selectedDate.getDate()}`;
+        const formattedDate = `${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}/${selectedDate.getDate().toString().padStart(2, '0')}`;
 
-        if (selectedDate.getDay() === 1 || customHolidays.includes(formattedDate)) {
+        if (this.value === todayStr || selectedDate.getDay() === 1 || customHolidays.includes(formattedDate)) {
           alert(`${formattedDate} 無法預約，請選擇其他日期！`);
           this.value = '';
         }
@@ -92,12 +94,8 @@
       });
 
       liff.init({ liffId: "2006300099-OLXDXZlb" })
-        .then(() => {
-          return liff.getProfile();
-        })
-        .then(profile => {
-          document.getElementById('name').value = profile.displayName || '';
-        })
+        .then(() => liff.getProfile())
+        .then(profile => document.getElementById('name').value = profile.displayName || '')
         .catch(err => console.error('Error initializing LIFF or fetching profile:', err));
 
       document.getElementById('bookingForm').addEventListener('submit', function (event) {
@@ -123,13 +121,15 @@
               type: 'box',
               layout: 'vertical',
               contents: [
-                { type: 'text', text: '台北市西門町Hange韓哥接髮專家', weight: 'bold', size: 'md', color: '#333333' },
-                { type: 'text', text: `項目: ${services}`, weight: 'bold', size: 'sm', color: '#007bff', margin: 'md' },
+                { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'sm' },
+                { type: 'text', text: `項目: ${services}`, weight: 'bold', size: 'sm', color: '#007bff' },
                 { type: 'separator', margin: 'xxl' },
                 { type: 'text', text: `名字: ${name}`, size: 'md', color: '#333333' },
                 { type: 'text', text: `電話: ${phone}`, size: 'md', color: '#333333' },
-                { type: 'text', text: `日期: ${date}`, size: 'md', color: '#333333' },
-                { type: 'text', text: `時段: ${time}`, size: 'md', color: '#333333' }
+                { type: 'text', text: `預約日期: ${date}`, size: 'md', color: '#333333' },
+                { type: 'text', text: `預約時段: ${time}`, size: 'md', color: '#333333' },
+                { type: 'separator', margin: 'xxl' },
+                { type: 'text', text: '台北西門町Hange韓哥', size: 'sm', color: '#555555' }
               ]
             }
           }
