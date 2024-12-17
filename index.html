@@ -62,15 +62,12 @@
     document.addEventListener('DOMContentLoaded', function () {
       const today = new Date();
       const todayStr = today.toISOString().split('T')[0];
-
-      const customHolidays = ["11/19", "12/25", "07/01", "08/15", "09/09", "10/10", "01/01", "02/28", "05/01", "06/15"]; // 自定義無法預約的日期
+      const customHolidays = ["11/19", "12/25", "07/01", "08/15", "09/09", "10/10", "01/01", "02/28", "05/01", "06/15"];
 
       document.getElementById('date').setAttribute('min', todayStr);
-
       document.getElementById('date').addEventListener('change', function () {
         const selectedDate = new Date(this.value);
         const formattedDate = `${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}/${selectedDate.getDate().toString().padStart(2, '0')}`;
-
         if (this.value === todayStr || selectedDate.getDay() === 1 || customHolidays.includes(formattedDate)) {
           alert(`${formattedDate} 無法預約，請選擇其他日期！`);
           this.value = '';
@@ -79,7 +76,6 @@
 
       const serviceOptions = document.querySelectorAll('#serviceOptions button');
       const selectedServices = new Set();
-
       serviceOptions.forEach(option => {
         option.addEventListener('click', function () {
           const value = this.getAttribute('data-value');
@@ -122,16 +118,27 @@
               layout: 'vertical',
               contents: [
                 { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'sm' },
-                { type: 'text', text: `項目: ${services}`, weight: 'bold', size: 'lg', color: '#007bff', margin: 'md' },
-                { type: 'separator', margin: 'xxl' },
                 { type: 'box', layout: 'horizontal', contents: [ 
-                    { type: 'text', text: '名字', size: 'md', color: '#555555', flex: 0 }, 
-                    { type: 'text', text: name, size: 'md', color: '#111111', align: 'end' } 
+                    { type: 'text', text: `${name}`, size: 'lg', color: '#333333', weight: 'bold', flex: 2 },
+                    { type: 'text', text: `${services}`, size: 'lg', color: '#007bff', align: 'end', flex: 3 }
                   ] 
                 },
-                { type: 'text', text: `電話: ${phone}`, size: 'md', color: '#333333', margin: 'md' },
-                { type: 'text', text: `預約日期: ${date}`, size: 'md', color: '#333333', margin: 'md' },
-                { type: 'text', text: `預約時段: ${time}`, size: 'md', color: '#333333', margin: 'md' },
+                { type: 'separator', margin: 'xxl' },
+                { type: 'box', layout: 'horizontal', contents: [ 
+                    { type: 'text', text: '電話', size: 'md', color: '#555555' }, 
+                    { type: 'text', text: phone, size: 'md', color: '#111111', align: 'end' } 
+                  ] 
+                },
+                { type: 'box', layout: 'horizontal', contents: [ 
+                    { type: 'text', text: '預約日期', size: 'md', color: '#555555' }, 
+                    { type: 'text', text: date, size: 'md', color: '#111111', align: 'end' } 
+                  ] 
+                },
+                { type: 'box', layout: 'horizontal', contents: [ 
+                    { type: 'text', text: '預約時段', size: 'md', color: '#555555' }, 
+                    { type: 'text', text: time, size: 'md', color: '#111111', align: 'end' } 
+                  ] 
+                },
                 { type: 'separator', margin: 'xxl' },
                 { 
                   type: 'button', 
