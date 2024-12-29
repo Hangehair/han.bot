@@ -18,10 +18,45 @@
     .multi-select button:hover { background-color: #0056b3; color: white; }
     .note { font-size: 12px; color: #666; }
   </style>
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script>
+    function authenticate() {
+      return gapi.auth2.getAuthInstance()
+        .signIn({ scope: "https://www.googleapis.com/auth/spreadsheets" })
+        .then(function() { console.log("Sign-in successful"); },
+              function(err) { console.error("Error signing in", err); });
+    }
+    function loadClient() {
+      gapi.client.setApiKey("YOUR_API_KEY");
+      return gapi.client.load("https://sheets.googleapis.com/$discovery/rest?version=v4")
+        .then(function() { console.log("GAPI client loaded for API"); },
+              function(err) { console.error("Error loading GAPI client for API", err); });
+    }
+    function execute() {
+      return gapi.client.sheets.spreadsheets.values.append({
+        "spreadsheetId": "YOUR_SPREADSHEET_ID",
+        "range": "Sheet1!A1:D1",
+        "valueInputOption": "RAW",
+        "resource": {
+          "values": [
+            [document.getElementById('name').value, document.getElementById('phone').value, document.getElementById('date').value, document.getElementById('time').value]
+          ]
+        }
+      })
+      .then(function(response) {
+        console.log("Response", response);
+      }, function(err) { console.error("Execute error", err); });
+    }
+    gapi.load("client:auth2", function() {
+      gapi.auth2.init({
+        client_id: "780648917483-1s6dq0nmj5p0g7drsj88s3uh2h7dbs6p.apps.googleusercontent.com"
+      });
+    });
+  </script>
 </head>
 <body>
   <div class="container">
-    <form id="bookingForm">
+    <form id="bookingForm" onsubmit="event.preventDefault(); authenticate().then(loadClient).then(execute);">
       <label for="name">1.姓名：</label>
       <input type="text" id="name" placeholder="名字" required>
 
@@ -109,60 +144,67 @@
         }
 
         const flexMessage = {
-          type: 'flex',
-          altText: '預約成功通知',
-          contents: {
-            type: 'bubble',
-            body: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'sm' },
-                { type: 'box', layout: 'horizontal', contents: [ 
-                    { type: 'text', text: `${name}`, size: 'lg', color: '#333333', weight: 'bold', flex: 2 },
-                    { type: 'text', text: `${services}`, size: 'lg', color: '#007bff', align: 'end', flex: 3 }
-                  ] 
-                },
-                { type: 'separator', margin: 'xxl' },
-                { type: 'box', layout: 'horizontal', contents: [ 
-                    { type: 'text', text: '電話', size: 'md', color: '#555555' }, 
-                    { type: 'text', text: phone, size: 'md', color: '#111111', align: 'end' } 
-                  ] 
-                },
-                { type: 'box', layout: 'horizontal', contents: [ 
-                    { type: 'text', text: '預約日期', size: 'md', color: '#555555' }, 
-                    { type: 'text', text: date, size: 'md', color: '#111111', align: 'end' } 
-                  ] 
-                },
-                { type: 'box', layout: 'horizontal', contents: [ 
-                    { type: 'text', text: '預約時段', size: 'md', color: '#555555' }, 
-                    { type: 'text', text: time, size: 'md', color: '#111111', align: 'end' } 
-                  ] 
-                },
-                { type: 'separator', margin: 'xxl' },
-                { 
-                  type: 'button', 
-                  action: { 
-                    type: 'uri', 
-                    label: 'Hange韓哥地址', 
-                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
-                  },
-                  style: 'primary',
-                  color: '#007bff'
-                }
-              ]
-            }
-          }
-        };
+  type: 'flex',
+  altText: '預約成功通知',
+  contents: {
+    type: 'bubble',
+    body: {
+      type: 'box',
+      layout: 'vertical',
+      contents: [
+        { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'sm' },
+        { 
+          type: 'box', 
+          layout: 'horizontal', 
+          contents: [ 
+            { type: 'text', text: `${name}`, size: 'lg', color: '#333333', weight: 'bold', flex: 2 },
+            { type: 'text', text: `${services}`, size: 'lg', color: '#007bff', align: 'end', flex: 3 } 
+          ] 
+        },
+        { type: 'separator', margin: 'xxl' },
+        { 
+          type: 'box', 
+          layout: 'horizontal', 
+          contents: [ 
+            { type: 'text', text: '電話', size: 'md', color: '#555555' }, 
+            { type: 'text', text: phone, size: 'md', color: '#111111', align: 'end' } 
+          ] 
+        },
+        { 
+          type: 'box', 
+          layout: 'horizontal', 
+          contents: [ 
+            { type: 'text', text: '預約日期', size: 'md', color: '#555555' }, 
+            { type: 'text', text: date, size: 'md', color: '#111111', align: 'end' } 
+          ] 
+        },
+        { 
+          type: 'box', 
+          layout: 'horizontal', 
+          contents: [ 
+            { type: 'text', text: '預約時段', size: 'md', color: '#555555' }, 
+            { type: 'text', text: time, size: 'md', color: '#111111', align: 'end' } 
+          ] 
+        },
+        { type: 'separator', margin: 'xxl' },
+        { 
+          type: 'button', 
+          action: { 
+            type: 'uri', 
+            label: 'Hange韓哥地址', 
+            uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9' 
+          },
+          style: 'primary',
+          color: '#007bff'
+        }
+      ]
+    }
+  }
+};
 
-        liff.sendMessages([flexMessage])
-          .then(() => {
-            alert('預約成功！您的資料已送出，請等待韓哥審核！');
-            liff.closeWindow();
-          })
-          .catch(err => console.error('Error sending Flex Message:', err));
-      });
-    });
-  </script>
-</body>
-</html>
+liff.sendMessages([flexMessage])
+  .then(() => {
+    alert('預約成功！您的資料已送出，請等待韓哥審核！');
+    liff.closeWindow();
+  })
+  .catch(err => console.error('Error sending Flex Message:', err));
