@@ -18,7 +18,8 @@ bin-release/
 # information for Eclipse / Flash Builder.
 
 # Credential files
-credentials.json
+shteecredentials.json
+calendercredentials.json
 
 # Environment files
 .env
