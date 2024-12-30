@@ -5,64 +5,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>台北西門町接髮專家Hange韓哥預約系統</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f8f8f8;
-    }
-    .container {
-      padding: 20px;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      background-color: #fff;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    label {
-      font-weight: bold;
-    }
-    input, select, button {
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-      text-align: center;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    button {
-      background-color: #007bff;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
+    body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f8f8f8; }
+    .container { padding: 20px; border: 2px solid #ccc; border-radius: 10px; background-color: #fff; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); width: 100%; max-width: 400px; }
+    form { display: flex; flex-direction: column; gap: 10px; }
+    label { font-weight: bold; }
+    input, select, button { padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; text-align: center; width: 100%; box-sizing: border-box; }
+    button { background-color: #007bff; color: white; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+    .multi-select { display: flex; flex-wrap: wrap; gap: 10px; }
+    .multi-select button { padding: 10px; border: 1px solid #007bff; background-color: #fff; color: #007bff; cursor: pointer; flex: 1 1 calc(50% - 10px); text-align: center; }
+    .multi-select button.selected { background-color: #007bff; color: #fff; }
+    .multi-select button:hover { background-color: #0056b3; color: white; }
+    .note { font-size: 12px; color: #666; }
   </style>
 </head>
 <body>
   <div class="container">
     <form id="bookingForm">
-      <label for="name">1. 姓名：</label>
-      <input type="text" id="name" placeholder="請輸入姓名" required>
+      <label for="name">1.姓名：</label>
+      <input type="text" id="name" placeholder="名字" required>
 
-      <label for="phone">2. 電話：</label>
+      <label for="phone">2.電話：</label>
       <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
 
-      <label for="date">3. 預約日期：</label>
+      <label for="date">3.預約日期：</label>
       <input type="date" id="date" placeholder="請選擇預約日期" required>
 
-      <label for="time">4. 預約時段：</label>
+      <label for="time">4.預約時段：</label>
       <select id="time" required>
         <option value="" disabled selected>請選擇預約時段</option>
         <option value="13:00">13:00</option>
@@ -72,68 +41,127 @@
         <option value="17:00">17:00</option>
       </select>
 
-      <label for="services">5. 預約項目：</label>
-      <select id="services" required>
-        <option value="" disabled selected>請選擇項目</option>
-        <option value="接髮">接髮</option>
-        <option value="染髮">染髮</option>
-        <option value="燙髮">燙髮</option>
-        <option value="剪髮">剪髮</option>
-        <option value="頭髮護理">頭髮護理</option>
-      </select>
+      <label>5.預約項目：</label>
+      <div class="multi-select" id="serviceOptions">
+        <button type="button" data-value="接髮">接髮</button>
+        <button type="button" data-value="染髮">染髮</button>
+        <button type="button" data-value="燙髮">燙髮</button>
+        <button type="button" data-value="剪髮">剪髮</button>
+        <button type="button" data-value="洗髮">洗髮</button>
+        <button type="button" data-value="頭髮護理">頭髮護理</button>
+        <button type="button" data-value="頭皮護理">頭皮護理</button>
+      </div>
+      <span class="note">* 可複選多個項目</span>
 
       <button type="submit">送出預約</button>
     </form>
   </div>
 
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
-    document.getElementById('bookingForm').addEventListener('submit', async function (event) {
-      event.preventDefault();
+    document.addEventListener('DOMContentLoaded', function () {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      const customHolidays = ["12/28", "12/29", "12/29", "12/30", "09/09", "10/10", "01/01", "02/28", "05/01", "06/15"];
 
-      const name = document.getElementById('name').value;
-      const phone = document.getElementById('phone').value;
-      const date = document.getElementById('date').value;
-      const time = document.getElementById('time').value;
-      const services = document.getElementById('services').value;
-
-      if (!name || !phone || !date || !time || !services) {
-        alert('請完整填寫所有欄位！');
-        return;
-      }
-
-      const eventDetails = {
-        summary: `${name} - ${services}`,
-        description: `電話：${phone}`,
-        start: {
-          dateTime: `${date}T${time}:00`,
-          timeZone: 'Asia/Taipei',
-        },
-        end: {
-          dateTime: `${date}T${parseInt(time.split(':')[0]) + 1}:00`,
-          timeZone: 'Asia/Taipei',
-        },
-      };
-
-      try {
-        const response = await fetch('/api/createEvent', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(eventDetails),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          alert('預約成功！請等待韓哥確認。');
-        } else {
-          throw new Error(result.message || '預約失敗');
+      document.getElementById('date').setAttribute('min', todayStr);
+      document.getElementById('date').addEventListener('change', function () {
+        const selectedDate = new Date(this.value);
+        const formattedDate = `${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}/${selectedDate.getDate().toString().padStart(2, '0')}`;
+        if (this.value === todayStr || selectedDate.getDay() === 1 || customHolidays.includes(formattedDate)) {
+          alert(`${formattedDate} 無法預約，請選擇其他日期！`);
+          this.value = '';
         }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('系統發生錯誤，請稍後再試！');
-      }
+      });
+
+      const serviceOptions = document.querySelectorAll('#serviceOptions button');
+      const selectedServices = new Set();
+      serviceOptions.forEach(option => {
+        option.addEventListener('click', function () {
+          const value = this.getAttribute('data-value');
+          if (selectedServices.has(value)) {
+            selectedServices.delete(value);
+            this.classList.remove('selected');
+          } else {
+            selectedServices.add(value);
+            this.classList.add('selected');
+          }
+        });
+      });
+
+      liff.init({ liffId: "2006300099-OLXDXZlb" })
+        .then(() => liff.getProfile())
+        .then(profile => document.getElementById('name').value = profile.displayName || '')
+        .catch(err => console.error('Error initializing LIFF or fetching profile:', err));
+
+      document.getElementById('bookingForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+        const services = Array.from(selectedServices).join(', ');
+
+        if (!services) {
+          alert('請至少選擇一個預約項目！');
+          return;
+        }
+
+        const flexMessage = {
+          type: 'flex',
+          altText: '預約成功通知',
+          contents: {
+            type: 'bubble',
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'sm' },
+                { type: 'box', layout: 'horizontal', contents: [ 
+                    { type: 'text', text: `${name}`, size: 'lg', color: '#333333', weight: 'bold', flex: 2 },
+                    { type: 'text', text: `${services}`, size: 'lg', color: '#007bff', align: 'end', flex: 3 }
+                  ] 
+                },
+                { type: 'separator', margin: 'xxl' },
+                { type: 'box', layout: 'horizontal', contents: [ 
+                    { type: 'text', text: '電話', size: 'md', color: '#555555' }, 
+                    { type: 'text', text: phone, size: 'md', color: '#111111', align: 'end' } 
+                  ] 
+                },
+                { type: 'box', layout: 'horizontal', contents: [ 
+                    { type: 'text', text: '預約日期', size: 'md', color: '#555555' }, 
+                    { type: 'text', text: date, size: 'md', color: '#111111', align: 'end' } 
+                  ] 
+                },
+                { type: 'box', layout: 'horizontal', contents: [ 
+                    { type: 'text', text: '預約時段', size: 'md', color: '#555555' }, 
+                    { type: 'text', text: time, size: 'md', color: '#111111', align: 'end' } 
+                  ] 
+                },
+                { type: 'separator', margin: 'xxl' },
+                { 
+                  type: 'button', 
+                  action: { 
+                    type: 'uri', 
+                    label: 'Hange韓哥地址', 
+                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
+                  },
+                  style: 'primary',
+                  color: '#007bff'
+                }
+              ]
+            }
+          }
+        };
+
+        liff.sendMessages([flexMessage])
+          .then(() => {
+            alert('預約成功！您的資料已送出，請等待韓哥審核！');
+            liff.closeWindow();
+          })
+          .catch(err => console.error('Error sending Flex Message:', err));
+      });
     });
   </script>
 </body>
