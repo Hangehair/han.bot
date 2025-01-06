@@ -18,7 +18,7 @@ bin-release/
 # information for Eclipse / Flash Builder.
 
 # Credential files
-*/shteecredentials.json
+*/shteecredentials
 *credentials.json
 *calendercredentials.json
 # 確保加入這些忽略規則
