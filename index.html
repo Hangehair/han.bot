@@ -55,67 +55,55 @@
         const time = document.getElementById('time').value;
 
         const flexMessage = {
-          type: 'flex',
-          altText: '預約成功通知',
-          contents: {
-            type: 'bubble',
-            body: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'lg', align: 'center' },
-                { type: 'separator', margin: 'md' },
-                {
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    { type: 'text', text: '電話', color: '#555555', size: 'md' },
-                    { type: 'text', text: phone, align: 'end', size: 'md', color: '#111111' }
-                  ]
-                },
-                {
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    { type: 'text', text: '預約日期', color: '#555555', size: 'md' },
-                    { type: 'text', text: date, align: 'end', size: 'md', color: '#111111' }
-                  ]
-                },
-                {
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    { type: 'text', text: '預約時段', color: '#555555', size: 'md' },
-                    { type: 'text', text: time, align: 'end', size: 'md', color: '#111111' }
-                  ]
-                },
-                { type: 'separator', margin: 'md' },
-                {
-                  type: 'button',
-                  action: {
-                    type: 'uri',
-                    label: '韓哥地址',
-                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
-                  },
-                  style: 'primary',
-                  color: '#007bff',
-                  margin: 'sm'
-                },
-                {
-                  type: 'button',
-                  action: {
-                    type: 'uri',
-                    label: '新增至行事曆',
-                    uri: `https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent('Hange韓哥預約')}&dates=${date.replace(/-/g, '')}T${time.replace(':', '')}00/${date.replace(/-/g, '')}T${time.replace(':', '')}00&details=${encodeURIComponent('Hange韓哥接髮預約')}&location=${encodeURIComponent('台北西門町')}`
-                  },
-                  style: 'primary',
-                  color: '#34A853',
-                  margin: 'sm'
-                }
-              ]
-            }
-          }
-        };
+  type: 'flex',
+  altText: '預約成功通知',
+  contents: {
+    type: 'bubble',
+    body: {
+      type: 'box',
+      layout: 'vertical',
+      contents: [
+        { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'sm' },
+        { type: 'separator', margin: 'md' },
+        { type: 'box', layout: 'horizontal', contents: [ 
+          { type: 'text', text: '電話', size: 'md', color: '#555555' }, 
+          { type: 'text', text: phone, size: 'md', color: '#111111', align: 'end' } 
+        ] },
+        { type: 'box', layout: 'horizontal', contents: [ 
+          { type: 'text', text: '預約日期', size: 'md', color: '#555555' }, 
+          { type: 'text', text: date, size: 'md', color: '#111111', align: 'end' } 
+        ] },
+        { type: 'box', layout: 'horizontal', contents: [ 
+          { type: 'text', text: '預約時段', size: 'md', color: '#555555' }, 
+          { type: 'text', text: time, size: 'md', color: '#111111', align: 'end' } 
+        ] },
+        { type: 'separator', margin: 'xxl' },
+        {
+          type: 'button',
+          action: {
+            type: 'uri',
+            label: 'Hange韓哥地址',
+            uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
+          },
+          style: 'primary',
+          color: '#007bff',
+          margin: 'md'
+        },
+        {
+          type: 'button',
+          action: {
+            type: 'uri',
+            label: '新增至行事曆',
+            uri: `https://calendar.google.com/calendar/r/eventedit?text=Hange韓哥預約&dates=${date.replace(/-/g, '')}T${time.replace(':', '')}00/${date.replace(/-/g, '')}T${time.replace(':', '')}00&details=預約內容：${services}&location=台北市西門町`
+          },
+          style: 'primary',
+          color: '#1DB446',
+          margin: 'md'
+        }
+      ]
+    }
+  }
+};
 
         liff.sendMessages([flexMessage])
           .then(() => {
