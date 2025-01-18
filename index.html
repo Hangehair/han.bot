@@ -62,7 +62,7 @@
     document.addEventListener('DOMContentLoaded', function () {
       const today = new Date();
       const todayStr = today.toISOString().split('T')[0];
-      const customHolidays = ["01/06", "01/07", "01/13", "01/14", "01/28", "01/29", "01/30", "01/31", "01/05", "01/08"];
+      const customHolidays = ["12/28", "12/29", "12/30", "09/09", "10/10", "01/01", "02/28", "05/01", "06/15"];
 
       document.getElementById('date').setAttribute('min', todayStr);
       document.getElementById('date').addEventListener('change', function () {
@@ -89,11 +89,6 @@
         });
       });
 
-      liff.init({ liffId: "2006300099-OLXDXZlb" })
-        .then(() => liff.getProfile())
-        .then(profile => document.getElementById('name').value = profile.displayName || '')
-        .catch(err => console.error('Error initializing LIFF or fetching profile:', err));
-
       document.getElementById('bookingForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
@@ -108,59 +103,14 @@
           return;
         }
 
-        const flexMessage = {
-          type: 'flex',
-          altText: '預約成功通知',
-          contents: {
-            type: 'bubble',
-            body: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'sm' },
-                { type: 'box', layout: 'horizontal', contents: [ 
-                    { type: 'text', text: `${name}`, size: 'lg', color: '#333333', weight: 'bold', flex: 2 },
-                    { type: 'text', text: `${services}`, size: 'lg', color: '#007bff', align: 'end', flex: 3 }
-                  ] 
-                },
-                { type: 'separator', margin: 'xxl' },
-                { type: 'box', layout: 'horizontal', contents: [ 
-                    { type: 'text', text: '電話', size: 'md', color: '#555555' }, 
-                    { type: 'text', text: phone, size: 'md', color: '#111111', align: 'end' } 
-                  ] 
-                },
-                { type: 'box', layout: 'horizontal', contents: [ 
-                    { type: 'text', text: '預約日期', size: 'md', color: '#555555' }, 
-                    { type: 'text', text: date, size: 'md', color: '#111111', align: 'end' } 
-                  ] 
-                },
-                { type: 'box', layout: 'horizontal', contents: [ 
-                    { type: 'text', text: '預約時段', size: 'md', color: '#555555' }, 
-                    { type: 'text', text: time, size: 'md', color: '#111111', align: 'end' } 
-                  ] 
-                },
-                { type: 'separator', margin: 'xxl' },
-                { 
-                  type: 'button', 
-                  action: { 
-                    type: 'uri', 
-                    label: 'Hange韓哥地址', 
-                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
-                  },
-                  style: 'primary',
-                  color: '#007bff'
-                }
-              ]
-            }
-          }
-        };
+        const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('預約 - ' + services)}&dates=${date.replace(/-/g, '')}T${time.replace(':', '')}00/${date.replace(/-/g, '')}T${time.replace(':', '')}00&details=${encodeURIComponent('姓名: ' + name + ', 電話: ' + phone)}&location=${encodeURIComponent('台北西門町')}`;
 
-        liff.sendMessages([flexMessage])
-          .then(() => {
-            alert('預約成功！您的資料已送出，請等待韓哥審核！');
-            liff.closeWindow();
-          })
-          .catch(err => console.error('Error sending Flex Message:', err));
+        const confirmation = `
+          預約已送出！
+          點擊以下連結新增到行事曆：
+          <a href="${calendarUrl}" target="_blank">新增到行事曆</a>
+        `;
+        document.body.innerHTML = confirmation;
       });
     });
   </script>
