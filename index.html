@@ -111,61 +111,174 @@
         const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('預約預約項目')}+${encodeURIComponent(services)}&dates=${date}T${time.replace(':', '')}00/${date}T${time.replace(':', '')}59&details=${encodeURIComponent('預約詳情')}+${encodeURIComponent(name)}+${encodeURIComponent(phone)}`;
 
         const flexMessage = {
-  type: 'flex',
-  altText: '預約成功通知',
-  contents: {
-    type: 'bubble',
-    body: {
-      type: 'box',
-      layout: 'vertical',
-      contents: [
-        { type: 'text', text: '預約確認單', weight: 'bold', color: '#1DB446', size: 'sm' },
-        { type: 'box', layout: 'horizontal', contents: [
-            { type: 'text', text: `${name}`, size: 'lg', color: '#333333', weight: 'bold', flex: 2 },
-            { type: 'text', text: `${services}`, size: 'lg', color: '#007bff', align: 'end', flex: 3 }
-          ]
-        },
-        { type: 'separator', margin: 'xxl' },
-        { type: 'box', layout: 'horizontal', contents: [
-            { type: 'text', text: '電話', size: 'md', color: '#555555' },
-            { type: 'text', text: phone, size: 'md', color: '#111111', align: 'end' }
-          ]
-        },
-        { type: 'box', layout: 'horizontal', contents: [
-            { type: 'text', text: '預約日期', size: 'md', color: '#555555' },
-            { type: 'text', text: date, size: 'md', color: '#111111', align: 'end' }
-          ]
-        },
-        { type: 'box', layout: 'horizontal', contents: [
-            { type: 'text', text: '預約時段', size: 'md', color: '#555555' },
-            { type: 'text', text: time, size: 'md', color: '#111111', align: 'end' }
-          ]
-        },
-        { type: 'separator', margin: 'xxl' },
-        { 
-          type: 'button', 
-          action: { 
-            type: 'uri', 
-            label: 'Hange韓哥地址', 
-            uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9' 
-          },
-          style: 'primary',
-          color: '#007bff'
-        },
-        {
-          type: 'button',
-          action: {
-            type: 'uri',
-            label: '新增至行事曆',
-            uri: `https://www.google.com/calendar/render?action=TEMPLATE&text=預約+Hange韓哥&dates=${date}T${time.replace(":", "")}00/${date}T${(parseInt(time.split(":")[0])+1).toString().padStart(2, '0')}${time.split(":")[1]}00`
-          },
-          style: 'primary',
-          color: '#28a745'
-        }
-      ]
-    }
-  }
-};
+          type: 'flex',
+          altText: '預約成功通知',
+          contents: {
+            type: 'bubble',
+            hero: {
+              type: 'image',
+              url: 'https://example.com/your-image-url.jpg', // 可替換為LOGO或主圖
+              size: 'full',
+              aspectRatio: '20:13',
+              aspectMode: 'cover'
+            },
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'text',
+                  text: '預約確認單',
+                  weight: 'bold',
+                  size: 'xl',
+                  color: '#1DB446',
+                  align: 'center',
+                  margin: 'md'
+                },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  margin: 'lg',
+                  spacing: 'sm',
+                  contents: [
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: '姓名',
+                          size: 'sm',
+                          color: '#555555',
+                          flex: 2
+                        },
+                        {
+                          type: 'text',
+                          text: name,
+                          size: 'sm',
+                          color: '#111111',
+                          align: 'end',
+                          flex: 3
+                        }
+                      ]
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: '電話',
+                          size: 'sm',
+                          color: '#555555',
+                          flex: 2
+                        },
+                        {
+                          type: 'text',
+                          text: phone,
+                          size: 'sm',
+                          color: '#111111',
+                          align: 'end',
+                          flex: 3
+                        }
+                      ]
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: '日期',
+                          size: 'sm',
+                          color: '#555555',
+                          flex: 2
+                        },
+                        {
+                          type: 'text',
+                          text: date,
+                          size: 'sm',
+                          color: '#111111',
+                          align: 'end',
+                          flex: 3
+                        }
+                      ]
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: '時段',
+                          size: 'sm',
+                          color: '#555555',
+                          flex: 2
+                        },
+                        {
+                          type: 'text',
+                          text: time,
+                          size: 'sm',
+                          color: '#111111',
+                          align: 'end',
+                          flex: 3
+                        }
+                      ]
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: '項目',
+                          size: 'sm',
+                          color: '#555555',
+                          flex: 2
+                        },
+                        {
+                          type: 'text',
+                          text: services,
+                          size: 'sm',
+                          color: '#111111',
+                          align: 'end',
+                          flex: 3
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  type: 'separator',
+                  margin: 'lg'
+                },
+                {
+                  type: 'button',
+                  action: {
+                    type: 'uri',
+                    label: 'Hange韓哥地址',
+                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
+                  },
+                  style: 'primary',
+                  color: '#007bff',
+                  margin: 'md'
+                },
+                {
+                  type: 'button',
+                  action: {
+                    type: 'uri',
+                    label: '新增至行事曆',
+                    uri: `https://www.google.com/calendar/render?action=TEMPLATE&text=預約+Hange韓哥&dates=${date}T${time.replace(":", "")}00/${date}T${(parseInt(time.split(":")[0]) + 1).toString().padStart(2, '0')}${time.split(":")[1]}00`
+                  },
+                  style: 'primary',
+                  color: '#28a745',
+                  margin: 'md'
+                }
+              ]
+            }
+          }
+        };
+
         liff.sendMessages([flexMessage])
           .then(() => {
             alert('預約成功！您的資料已送出，請等待韓哥審核！');
