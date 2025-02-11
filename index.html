@@ -59,49 +59,35 @@
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
-  const customHolidays = ["2/3", "2/4", "2/10", "2/11", "2/17", "2/18", "2/24", "2/25"];
+  const customHolidays = ["02-03", "02-04", "02-10", "02-11", "02-17", "02-18", "02-24", "02-25"];
 
   document.getElementById('date').setAttribute('min', todayStr);
   document.getElementById('date').addEventListener('change', function () {
     const selectedDate = new Date(this.value);
-    const formattedDate = `${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}/${selectedDate.getDate().toString().padStart(2, '0')}`;
+    const formattedDate = `${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`;
     if (selectedDate.getDay() === 1 || customHolidays.includes(formattedDate)) {
       alert(`${formattedDate} 無法預約，請選擇其他日期！`);
       this.value = '';
     }
   });
 
-  const serviceOptions = document.querySelectorAll('#serviceOptions button');
-  const selectedServices = new Set();
-  serviceOptions.forEach(option => {
-    option.addEventListener('click', function () {
-      const value = this.getAttribute('data-value');
-      if (selectedServices.has(value)) {
-        selectedServices.delete(value);
-        this.classList.remove('selected');
-      } else {
-        selectedServices.add(value);
-        this.classList.add('selected');
-      }
-    });
-  });
+  try {
+    await liff.init({ liffId: "2006300099-OLXDXZlb" });
+    const profile = await liff.getProfile();
+    document.getElementById('name').value = profile.displayName || '';
+  } catch (err) {
+    console.error('無法讀取 LINE 用戶名稱', err);
+  }
 
-  document.getElementById('bookingForm').addEventListener('submit', function (event) {
+  document.getElementById('bookingForm').addEventListener('submit', async function (event) {
     event.preventDefault();
-
     const name = document.getElementById('name').value;
     const phone = document.getElementById('phone').value;
     const date = document.getElementById('date').value;
     const time = document.getElementById('time').value;
-    const services = Array.from(selectedServices).join(', ');
-
-    if (!services) {
-      alert('請至少選擇一個預約項目！');
-      return;
-    }
 
     const flexMessage = {
       type: 'flex',
@@ -113,15 +99,20 @@ document.addEventListener('DOMContentLoaded', function () {
           layout: 'vertical',
           contents: [
             { type: 'text', text: '預約成功 🎉', weight: 'bold', size: 'xl', color: '#FF5733', align: 'center' },
-            { type: 'text', text: `👤 ${name}\n📞 ${phone}\n📅 ${date}  ⏰ ${time}\n✂️ ${services}`, size: 'sm', color: '#111111', align: 'center', margin: 'md' }
+            { type: 'text', text: `👤 ${name}\n📞 ${phone}\n📅 ${date}  ⏰ ${time}`, size: 'sm', color: '#111111', align: 'center', margin: 'md' }
           ]
         }
       }
     };
 
-    liff.sendMessages([flexMessage])
-      .then(() => { alert('✅ 預約成功！'); liff.closeWindow(); })
-      .catch(err => console.error('Error sending Flex Message:', err));
+    try {
+      await liff.sendMessages([flexMessage]);
+      alert('✅ 預約成功！');
+      liff.closeWindow();
+    } catch (err) {
+      console.error('Flex 訊息發送失敗', err);
+      alert('❌ 預約失敗，請稍後再試！');
+    }
   });
 });
   </script>
