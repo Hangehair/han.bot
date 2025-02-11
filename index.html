@@ -98,8 +98,62 @@ document.addEventListener('DOMContentLoaded', async function () {
           type: 'box',
           layout: 'vertical',
           contents: [
-            { type: 'text', text: '預約成功 🎉', weight: 'bold', size: 'xl', color: '#FF5733', align: 'center' },
-            { type: 'text', text: `👤 ${name}\n📞 ${phone}\n📅 ${date}  ⏰ ${time}`, size: 'sm', color: '#111111', align: 'center', margin: 'md' }
+            { 
+              type: 'text', 
+              text: '📅 預約通知', 
+              weight: 'bold', 
+              size: 'xl', 
+              color: '#FF5733', 
+              align: 'center',
+              margin: 'md'
+            },
+            {
+              type: 'box',
+              layout: 'horizontal',
+              contents: [
+                { type: 'text', text: `👤 ${name}`, size: 'md', color: '#333333', weight: 'bold', flex: 2 },
+                { type: 'text', text: `✂️ 項目`, size: 'md', color: '#007bff', align: 'end', flex: 3 }
+              ]
+            },
+            { type: 'separator', margin: 'xxl' },
+            {
+              type: 'box',
+              layout: 'horizontal',
+              contents: [
+                { type: 'text', text: '📅 日期', size: 'md', color: '#555555', flex: 2 },
+                { type: 'text', text: date, size: 'md', color: '#111111', align: 'end', flex: 3 }
+              ]
+            },
+            { type: 'spacer', size: 'md' },
+            {
+              type: 'box',
+              layout: 'horizontal',
+              contents: [
+                { type: 'text', text: '📞 電話', size: 'md', color: '#555555', flex: 2 },
+                { type: 'text', text: phone, size: 'md', color: '#111111', align: 'end', flex: 3 }
+              ]
+            },
+            { type: 'separator', margin: 'xxl' },
+            { 
+              type: 'button', 
+              action: { 
+                type: 'uri', 
+                label: '📍 韓哥地圖', 
+                uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9' 
+              },
+              style: 'primary',
+              color: '#007bff'
+            },
+            {
+              type: 'button',
+              action: {
+                type: 'uri',
+                label: '🗓️ 加入行事曆',
+                uri: `https://www.google.com/calendar/render?action=TEMPLATE&text=預約+Hange韓哥&dates=${date}T${time.replace(":", "")}00/${date}T${(parseInt(time.split(":")[0]) + 1).toString().padStart(2, '0')}${time.split(":")[1]}00`
+              },
+              style: 'primary',
+              color: '#28a745'
+            }
           ]
         }
       }
@@ -115,6 +169,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   });
 });
-  </script>
+</script>
 </body>
 </html>
