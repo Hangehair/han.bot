@@ -12,8 +12,8 @@
     label { font-weight: 600; color: #2d3748; font-size: 15px; }
     input, select, button { padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 15px; transition: all 0.3s ease; }
     input:focus, select:focus { border-color: #007bff; box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1); }
-    button { background: #007bff; color: white; font-weight: 600; cursor: pointer; border: none; }
-    button:hover { background: #0056b3; }
+    button { background: #fff; color: #007bff; font-weight: 600; cursor: pointer; border: 2px solid #007bff; }
+    button:hover { background: #e3f2fd; }
     .multi-select { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .multi-select button { padding: 12px; border: 1px solid #007bff; background: white; color: #007bff; border-radius: 8px; transition: all 0.2s; }
     .multi-select button.selected { background: #007bff; color: white; }
@@ -27,7 +27,6 @@
       <strong>📢 預約公告</strong><br>
       ✨ 每週星期一、星期二公休<br>
       ✨ 週三～週日預約時段：12:30 - 18:00<br>
-      ✨ 特殊休假日：5/6、5/20、5/27<br>
       ✨ 其他時段需求歡迎私訊討論！
     </div>
     
@@ -121,13 +120,21 @@
 
         if (!services) return alert('請選擇至少一項服務！');
 
-        // Google Calendar 連結生成
-        const [hour, minute] = time.split(':');
-        const start = `${date.replace(/-/g, '')}T${hour}${minute}00`;
-        const endDate = new Date(`${date}T${time}:00`);
-        endDate.setMinutes(endDate.getMinutes() + 90); // 預設90分鐘服務時間
-        const end = endDate.toISOString().replace(/[-:]/g, '').substring(0, 15);
+        // 計算結束時間（+60分鐘）
+        const [hour, minute] = time.split(':').map(Number);
+        const startDateTime = new Date(`${date}T${time}:00`);
+        const endDateTime = new Date(startDateTime.getTime() + 60 * 60000);
+        const endHour = endDateTime.getHours().toString().padStart(2, '0');
+        const endMinute = endDateTime.getMinutes().toString().padStart(2, '0');
+        const endTime = `${endHour}:${endMinute}`;
 
+        // 產生 .ics 下載連結
+        const title = encodeURIComponent('預約韓哥');
+        const description = encodeURIComponent(`預約服務：${services}，電話：${phone}，姓名：${name}`);
+        const location = encodeURIComponent('台北市萬華區西門町');
+        const icsApi = `https://han-bot-ch2n.vercel.app/ics?title=${title}&start=${date}T${time}&duration=60&description=${description}&location=${location}`;
+
+        // Flex Message 設計
         const flexMessage = {
           type: 'flex',
           altText: '預約成功通知',
@@ -139,10 +146,54 @@
               contents: [
                 { type: 'text', text: '預約確認單', weight: 'bold', color: "#1DB446", size: "lg", align: "center", margin: "lg" },
                 { type: 'separator', margin: "lg" },
-                { type: 'text', text: name, weight: "bold", size: "xl", margin: "lg", color: "#2d3748" },
-                { type: 'text', text: `📅 ${date} ${time}`, margin: "md", color: "#4a5568" },
-                { type: 'text', text: `📞 ${phone}`, margin: "sm", color: "#4a5568" },
-                { type: 'text', text: `💇♀️ ${services}`, margin: "lg", color: "#007bff", wrap: true },
+                // 資料區域
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  margin: 'md',
+                  contents: [
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        { type: 'text', text: '姓名', color: '#888', flex: 2, align: 'start', size: 'md' },
+                        { type: 'text', text: name, color: '#222', flex: 4, align: 'end', size: 'md', weight: 'bold' }
+                      ]
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        { type: 'text', text: '服務項目', color: '#888', flex: 2, align: 'start', size: 'md' },
+                        { type: 'text', text: services, color: '#007bff', flex: 4, align: 'end', size: 'md', weight: 'bold', wrap: true }
+                      ]
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        { type: 'text', text: '預約日期', color: '#888', flex: 2, align: 'start', size: 'md' },
+                        { type: 'text', text: date, color: '#222', flex: 4, align: 'end', size: 'md' }
+                      ]
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        { type: 'text', text: '預約時段', color: '#888', flex: 2, align: 'start', size: 'md' },
+                        { type: 'text', text: `${time} ~ ${endTime}`, color: '#222', flex: 4, align: 'end', size: 'md' }
+                      ]
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        { type: 'text', text: '電話', color: '#888', flex: 2, align: 'start', size: 'md' },
+                        { type: 'text', text: phone, color: '#222', flex: 4, align: 'end', size: 'md' }
+                      ]
+                    }
+                  ]
+                },
                 { type: 'separator', margin: "xl" },
                 {
                   type: 'button',
@@ -151,30 +202,19 @@
                     label: '📍 韓哥髮廊地址',
                     uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
                   },
-                  style: 'primary',
-                  color: "#1DB446",
+                  style: 'link',
+                  color: "#007bff",
                   margin: "md"
                 },
                 {
                   type: 'button',
                   action: {
                     type: 'uri',
-                    label: '📅 加入行事曆',
-                    uri: `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('預約 Hange韓哥')}&dates=${start}/${end}&ctz=Asia/Taipei&details=${encodeURIComponent(`服務項目：${services}\n電話：${phone}`)}&location=${encodeURIComponent('台北市萬華區西門町')}`
+                    label: '一鍵加入手機日曆',
+                    uri: icsApi
                   },
-                  style: 'primary',
+                  style: 'link',
                   color: "#007bff",
-                  margin: "sm"
-                },
-                {
-                  type: 'button',
-                  action: {
-                    type: 'uri',
-                    label: '🗓 訂閱營業日曆',
-                    uri: 'https://calendar.google.com/calendar/ical/winter81943%40yahoo.com.tw/public/basic.ics'
-                  },
-                  style: 'secondary',
-                  color: "#f5b041",
                   margin: "sm"
                 }
               ]
