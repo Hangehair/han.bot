@@ -132,7 +132,7 @@
         const title = encodeURIComponent('預約韓哥');
         const description = encodeURIComponent(`預約服務：${services}，電話：${phone}，姓名：${name}`);
         const location = encodeURIComponent('台北市萬華區西門町');
-        const icsApi = `https://han-bot-ch2n.vercel.app/ics?title=${title}&start=${date}T${time}&duration=60&description=${description}&location=${location}`;
+        const icsApi = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}&duration=60&description=${description}&location=${location}`;
 
         // Flex Message 設計
         const flexMessage = {
@@ -227,7 +227,10 @@
             alert('預約成功！我們已收到您的資料，韓哥將親自與您確認！');
             liff.closeWindow();
           })
-          .catch(err => console.error('Error:', err));
+          .catch(err => {
+            alert('發送訊息失敗：' + (err.message || err));
+            console.error('Error:', err);
+          });
       });
     });
   </script>
