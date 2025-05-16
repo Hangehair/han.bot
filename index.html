@@ -2,14 +2,14 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>台北西門町接髮專家Hange韓哥預約系統</title>
   <style>
-    body { font-family: 'Arial', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); }
-    .container { padding: 25px; border-radius: 15px; background: white; box-shadow: 0 6px 20px rgba(0,0,0,0.08); width:100%; max-width:450px; }
-    .notice { background: linear-gradient(90deg,#f8fafc 80%,#e3f2fd 100%); border-left:4px solid #007bff; padding:15px; margin-bottom:20px; border-radius:8px; color:#2d3748; font-size:14px; line-height:1.6;}
-    form { display:flex; flex-direction:column; gap:12px;}
-    label { font-weight:600; color:#2d3748; font-size:15px;}
+    body { font-family: 'Arial', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%); }
+    .container { padding:25px; border-radius:15px; background:#fff; box-shadow:0 6px 20px rgba(0,0,0,0.08); width:100%; max-width:450px; }
+    .notice { background:linear-gradient(90deg,#f8fafc 80%,#e3f2fd 100%); border-left:4px solid #007bff; padding:15px; margin-bottom:20px; border-radius:8px; color:#2d3748; font-size:14px; line-height:1.6; }
+    form { display:flex; flex-direction:column; gap:12px; }
+    label { font-weight:600; color:#2d3748; font-size:15px; }
     input, select, button { padding:12px; border:1px solid #e2e8f0; border-radius:8px; font-size:15px; transition:all .3s ease; }
     input:focus, select:focus { border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.1); }
     button { background:#fff; color:#007bff; font-weight:600; cursor:pointer; border:2px solid #007bff; }
@@ -83,22 +83,24 @@
       // 多選項目
       const sel = new Set();
       document.querySelectorAll('#serviceOptions button').forEach(btn=>{
-        btn.addEventListener('click', ()=>{
+        btn.addEventListener('click', () => {
           const v = btn.dataset.value;
           btn.classList.toggle('selected');
-          sel.has(v)? sel.delete(v): sel.add(v);
+          sel.has(v) ? sel.delete(v) : sel.add(v);
         });
       });
       // LIFF Init
       liff.init({ liffId: "2006300099-OLXDXZlb" })
-        .then(()=> liff.getProfile().then(p=>document.getElementById('name').value=p.displayName))
+        .then(() => liff.getProfile().then(p => {
+          document.getElementById('name').value = p.displayName;
+        }))
         .catch(console.error);
 
       // Submit
       document.getElementById('bookingForm').addEventListener('submit', e => {
         e.preventDefault();
-        const name = document.getElementById('name').value;
-        const phone = document.getElementById('phone').value;
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
         const date = dateInput.value;
         const time = timeSelect.value;
         const services = Array.from(sel).join(', ');
@@ -107,7 +109,7 @@
         // 計算結束時間（+60 分鐘）
         const [h,m] = time.split(':').map(Number);
         const st = new Date(`${date}T${time}:00`);
-        const et = new Date(st.getTime()+60*60000);
+        const et = new Date(st.getTime() + 60 * 60000);
         const endTime = `${et.getHours().toString().padStart(2,'0')}:${et.getMinutes().toString().padStart(2,'0')}`;
 
         // .ics 下載連結
@@ -116,50 +118,53 @@
         const loc   = encodeURIComponent('台北市萬華區西門町');
         const ics   = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}&duration=60&description=${desc}&location=${loc}`;
 
-        // Flex Message
+        // 簡化版 Flex Message
         const flexMessage = {
           type: 'flex',
           altText: '預約成功通知',
           contents: {
             type: 'bubble',
             body: {
-              type: 'box', layout: 'vertical',
+              type: 'box',
+              layout: 'vertical',
               contents: [
-                { type:'text', text:'預約確認單', weight:'bold', color:'#1DB446', size:'lg', align:'center', margin:'lg' },
-                { type:'separator', margin:'lg' },
-                { type:'box', layout:'vertical', margin:'md', contents: [
-                  { type:'box', layout:'horizontal', contents:[
-                      { type:'text', text:'姓名', flex:3, align:'start', color:'#888' },
-                      { type:'text', text:name, flex:7, align:'end', weight:'bold', color:'#2d3748', wrap:true }
-                    ]
-                  },
-                  { type:'box', layout:'horizontal', contents:[
-                      { type:'text', text:'服務項目', flex:3, align:'start', color:'#888' },
-                      { type:'text', text:services, flex:7, align:'end', weight:'bold', color:'#007bff', wrap:true }
-                    ]
-                  },
-                  { type:'box', layout:'horizontal', contents:[
-                      { type:'text', text:'預約日期', flex:3, align:'start', color:'#888' },
-                      { type:'text', text:date, flex:7, align:'end', color:'#4a5568' }
-                    ]
-                  },
-                  { type:'box', layout:'horizontal', contents:[
-                      { type:'text', text:'預約時段', flex:3, align:'start', color:'#888' },
-                      { type:'text', text:`${time} ~ ${endTime}`, flex:7, align:'end', color:'#4a5568' }
-                    ]
-                  },
-                  { type:'box', layout:'horizontal', contents:[
-                      { type:'text', text:'電話', flex:3, align:'start', color:'#888' },
-                      { type:'text', text:phone, flex:7, align:'end', color:'#4a5568' }
-                    ]
-                  }
-                ]},
-                { type:'separator', margin:'xl' },
-                { type:'button', style:'primary', color:'#1DB446', margin:'md',
-                  action:{ type:'uri', label:'📍 韓哥髮廊地址', uri:'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9' }
+                {
+                  type: 'text',
+                  text: '🎉 預約完成！',
+                  weight: 'bold',
+                  size: 'lg',
+                  align: 'center'
                 },
-                { type:'button', style:'primary', color:'#007bff', margin:'sm',
-                  action:{ type:'uri', label:'一鍵加入手機日曆', uri:ics }
+                {
+                  type: 'text',
+                  text: `${date} ${time} ~ ${endTime}`,
+                  margin: 'md',
+                  align: 'center'
+                }
+              ]
+            },
+            footer: {
+              type: 'box',
+              layout: 'vertical',
+              spacing: 'sm',
+              contents: [
+                {
+                  type: 'button',
+                  style: 'primary',
+                  action: {
+                    type: 'uri',
+                    label: '加入手機日曆',
+                    uri: ics
+                  }
+                },
+                {
+                  type: 'button',
+                  style: 'secondary',
+                  action: {
+                    type: 'uri',
+                    label: '查看韓哥髮廊地址',
+                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
+                  }
                 }
               ]
             }
@@ -167,12 +172,12 @@
         };
 
         liff.sendMessages([flexMessage])
-          .then(()=>{
+          .then(() => {
             alert('預約成功！我們已收到您的資料，韓哥將親自與您確認！');
             liff.closeWindow();
           })
-          .catch(err=>{
-            alert('發送訊息失敗：'+(err.message||err));
+          .catch(err => {
+            alert('發送訊息失敗：' + (err.message || err));
             console.error(err);
           });
       });
