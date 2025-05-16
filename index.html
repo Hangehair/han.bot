@@ -67,6 +67,7 @@
           timeSelect.innerHTML += `<option value="${t}">${t}</option>`;
         }
       }
+      // 日期驗證
       const dateInput = document.getElementById('date');
       const todayStr = new Date().toISOString().split('T')[0];
       dateInput.min = todayStr;
@@ -79,6 +80,7 @@
           this.value = '';
         }
       });
+      // 多選項目
       const sel = new Set();
       document.querySelectorAll('#serviceOptions button').forEach(btn=>{
         btn.addEventListener('click', () => {
@@ -87,13 +89,14 @@
           sel.has(v) ? sel.delete(v) : sel.add(v);
         });
       });
-
+      // LIFF Init
       liff.init({ liffId: "2006300099-OLXDXZlb" })
         .then(() => liff.getProfile().then(p => {
           document.getElementById('name').value = p.displayName;
         }))
         .catch(console.error);
 
+      // Submit
       document.getElementById('bookingForm').addEventListener('submit', e => {
         e.preventDefault();
         const name = document.getElementById('name').value.trim();
@@ -103,65 +106,40 @@
         const services = Array.from(sel).join(', ');
         if (!services) return alert('請選擇至少一項服務！');
 
+        // 計算結束時間（+60 分鐘）
         const [h,m] = time.split(':').map(Number);
         const st = new Date(`${date}T${time}:00`);
         const et = new Date(st.getTime() + 60 * 60000);
         const endTime = `${et.getHours().toString().padStart(2,'0')}:${et.getMinutes().toString().padStart(2,'0')}`;
 
+        // .ics 下載連結
         const title = encodeURIComponent('預約韓哥');
         const desc  = encodeURIComponent(`預約服務：${services}\n電話：${phone}\n姓名：${name}`);
         const loc   = encodeURIComponent('台北市萬華區西門町');
         const ics   = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}&duration=60&description=${desc}&location=${loc}`;
 
-        // 改為完整版本的 Flex Message
+        // 簡化版 Flex Message
         const flexMessage = {
           type: 'flex',
           altText: '預約成功通知',
           contents: {
             type: 'bubble',
-            size: 'mega',
             body: {
               type: 'box',
               layout: 'vertical',
-              spacing: 'md',
               contents: [
                 {
                   type: 'text',
-                  text: '✅ 預約成功',
+                  text: '🎉 預約完成！',
                   weight: 'bold',
-                  size: 'xl',
-                  align: 'center',
-                  color: '#1a73e8'
-                },
-                {
-                  type: 'separator',
-                  margin: 'md'
-                },
-                {
-                  type: 'box',
-                  layout: 'vertical',
-                  spacing: 'sm',
-                  margin: 'md',
-                  contents: [
-                    { type: 'text', text: `姓名：${name}`, size: 'md', wrap: true },
-                    { type: 'text', text: `電話：${phone}`, size: 'md', wrap: true },
-                    { type: 'text', text: `日期：${date}`, size: 'md', wrap: true },
-                    { type: 'text', text: `時段：${time} ~ ${endTime}`, size: 'md', wrap: true },
-                    { type: 'text', text: `項目：${services}`, size: 'md', wrap: true }
-                  ]
-                },
-                {
-                  type: 'separator',
-                  margin: 'md'
+                  size: 'lg',
+                  align: 'center'
                 },
                 {
                   type: 'text',
-                  text: '感謝您的預約！韓哥將親自與您確認時段！',
-                  size: 'sm',
-                  color: '#888888',
-                  align: 'center',
-                  wrap: true,
-                  margin: 'md'
+                  text: `${date} ${time} ~ ${endTime}`,
+                  margin: 'md',
+                  align: 'center'
                 }
               ]
             },
@@ -173,7 +151,6 @@
                 {
                   type: 'button',
                   style: 'primary',
-                  color: '#1a73e8',
                   action: {
                     type: 'uri',
                     label: '加入手機日曆',
