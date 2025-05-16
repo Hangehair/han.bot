@@ -10,7 +10,6 @@ module.exports = async (req, res) => {
     location = ''
   } = req.query;
 
-  // 處理開始/結束時間
   const startDate = new Date(start);
   const startArr = [
     startDate.getFullYear(),
@@ -19,6 +18,7 @@ module.exports = async (req, res) => {
     startDate.getHours(),
     startDate.getMinutes()
   ];
+
   const endDate = new Date(startDate.getTime() + Number(duration) * 60000);
   const endArr = [
     endDate.getFullYear(),
@@ -28,18 +28,9 @@ module.exports = async (req, res) => {
     endDate.getMinutes()
   ];
 
-  // 前一天 11:30 提醒
   const alarmDate = new Date(startDate);
   alarmDate.setDate(alarmDate.getDate() - 1);
   alarmDate.setHours(11, 30, 0, 0);
-
-  const alarmTrigger = [
-    alarmDate.getFullYear(),
-    alarmDate.getMonth() + 1,
-    alarmDate.getDate(),
-    alarmDate.getHours(),
-    alarmDate.getMinutes()
-  ];
 
   const alarms = [
     {
@@ -47,7 +38,13 @@ module.exports = async (req, res) => {
       description: '預約提醒：明天有預約韓哥',
       trigger: {
         type: 'date-time',
-        value: alarmTrigger
+        value: [
+          alarmDate.getFullYear(),
+          alarmDate.getMonth() + 1,
+          alarmDate.getDate(),
+          alarmDate.getHours(),
+          alarmDate.getMinutes()
+        ]
       }
     }
   ];
@@ -61,14 +58,14 @@ module.exports = async (req, res) => {
     alarms,
     startInputType: 'local',
     startOutputType: 'local',
-    productId: '//HangeHair//Booking//TW',
-    timezone: 'Asia/Taipei' // **關鍵設定**
+    productId: '//HangeHair//Booking'
   };
 
   return new Promise((resolve) => {
     createEvent(event, (error, value) => {
       if (error) {
-        res.status(500).send('產生失敗');
+        console.error('ICS 產生錯誤:', error); // 加入錯誤 log
+        res.status(500).send('產生失敗，請稍後再試');
         return resolve();
       }
       res.setHeader('Content-Type', 'text/calendar');
