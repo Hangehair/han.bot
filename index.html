@@ -104,13 +104,12 @@
         const services = Array.from(sel).join(', ');
         if (!services) return alert('請選擇至少一項服務！');
 
-        // .ics 連結（不含 duration）
+        // .ics 日曆連結
         const title = encodeURIComponent('預約韓哥');
         const desc  = encodeURIComponent(`預約服務：${services}\n電話：${phone}\n姓名：${name}`);
         const loc   = encodeURIComponent('台北市萬華區西門町');
         const ics   = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}:00&description=${desc}&location=${loc}`;
 
-        // Flex Message（無結束時間）
         const flexMessage = {
           type: 'flex',
           altText: '預約成功通知',
@@ -120,19 +119,12 @@
               type: 'box',
               layout: 'vertical',
               contents: [
-                {
-                  type: 'text',
-                  text: '🎉 預約完成！',
-                  weight: 'bold',
-                  size: 'lg',
-                  align: 'center'
-                },
-                {
-                  type: 'text',
-                  text: `${date} ${time}`,
-                  margin: 'md',
-                  align: 'center'
-                }
+                { type: 'text', text: '🎉 預約成功！', weight: 'bold', size: 'lg', align: 'center' },
+                { type: 'text', text: `${date} ${time}`, align: 'center', margin: 'md' },
+                { type: 'separator', margin: 'md' },
+                { type: 'text', text: `姓名：${name}`, margin: 'md' },
+                { type: 'text', text: `電話：${phone}`, margin: 'sm' },
+                { type: 'text', text: `項目：${services}`, wrap: true, margin: 'sm' }
               ]
             },
             footer: {
