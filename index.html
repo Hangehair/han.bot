@@ -1,110 +1,74 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>台北西門町接髮專家Hange韓哥預約系統</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; margin: 0;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
     }
     .container {
-      padding: 25px;
-      border-radius: 15px;
-      background: #fff;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-      width: 100%;
-      max-width: 450px;
+      padding: 25px; border-radius: 15px;
+      background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      width: 100%; max-width: 450px;
     }
     .notice {
-      background: linear-gradient(90deg, #f8fafc 80%, #e3f2fd 100%);
+      background: linear-gradient(90deg, #f8fafc, #e3f2fd);
       border-left: 4px solid #007bff;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-radius: 8px;
+      padding: 15px; margin-bottom: 20px;
+      border-radius: 8px; font-size: 14px; line-height: 1.6;
       color: #2d3748;
-      font-size: 14px;
-      line-height: 1.6;
     }
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    label {
-      font-weight: 600;
-      color: #2d3748;
-      font-size: 15px;
-    }
+    form { display: flex; flex-direction: column; gap: 12px; }
+    label { font-weight: 600; color: #2d3748; font-size: 15px; }
     input, select, button {
-      padding: 12px;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 15px;
+      padding: 12px; border-radius: 8px;
+      font-size: 15px; border: 1px solid #e2e8f0;
       transition: all .3s ease;
     }
     input:focus, select:focus {
-      border-color: #007bff;
-      box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+      border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
     }
     button {
-      background: #fff;
-      color: #007bff;
-      font-weight: 600;
-      cursor: pointer;
-      border: 2px solid #007bff;
+      background: #fff; color: #007bff; font-weight: 600;
+      border: 2px solid #007bff; cursor: pointer;
     }
-    button:hover {
-      background: #e3f2fd;
-    }
+    button:hover { background: #e3f2fd; }
     .multi-select {
-      display: grid;
-      grid-template-columns: repeat(2,1fr);
-      gap: 10px;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
     }
     .multi-select button {
-      padding: 12px;
-      border: 1px solid #007bff;
-      background: #fff;
-      color: #007bff;
-      border-radius: 8px;
-      transition: all .2s;
+      background: #fff; border: 1px solid #007bff; color: #007bff;
+      border-radius: 8px; transition: 0.2s;
     }
     .multi-select button.selected {
-      background: #007bff;
-      color: #fff;
+      background: #007bff; color: #fff;
     }
     .multi-select button:hover:not(.selected) {
       background: #e3f2fd;
     }
-    .note {
-      font-size: 12px;
-      color: #718096;
-      margin-top: -8px;
-    }
+    .note { font-size: 12px; color: #718096; margin-top: -8px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="notice">
-      <strong>預約公告</strong><br>
-      每週星期一、星期二公休<br>
-      週三～週日預約時段：12:30 - 18:00<br>
-      其他時段需求歡迎私訊討論
+      <strong>📢 預約公告</strong><br>
+      ✨ 每週星期一、星期二公休<br>
+      ✨ 週三～週日預約時段：12:30 - 18:00<br>
+      ✨ 其他時段需求歡迎私訊討論！
     </div>
     <form id="bookingForm">
       <label for="name">1. 姓名：</label>
-      <input type="text" id="name" placeholder="您的姓名" required>
+      <input type="text" id="name" placeholder="您的姓名" required />
       <label for="phone">2. 電話：</label>
-      <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
+      <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required />
       <label for="date">3. 預約日期：</label>
-      <input type="date" id="date" required>
+      <input type="date" id="date" required />
       <label for="time">4. 預約時段：</label>
       <select id="time" required>
         <option value="" disabled selected>請選擇時段</option>
@@ -127,164 +91,126 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 生成 12:30~18:00 每半小時時段
       const timeSelect = document.getElementById('time');
-      for (let h = 12; h <= 18; h++) {
-        for (let m = (h === 12 ? 30 : 0); m < 60; m += 30) {
-          if (h === 18 && m >= 30) break;
-          const t = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
-          timeSelect.innerHTML += `<option value="${t}">${t}</option>`;
-        }
+      for (let h = 12; h <= 17; h++) {
+        ['00', '30'].forEach(min => {
+          if (h === 12 && min === '00') return;
+          const t = `${h.toString().padStart(2, '0')}:${min}`;
+          const option = new Option(t, t);
+          timeSelect.appendChild(option);
+        });
       }
 
-      // 日期最小值 & 公休檢查
       const dateInput = document.getElementById('date');
       dateInput.min = new Date().toISOString().split('T')[0];
-      const holidays = ["05/06","05/20","05/27"];
-      dateInput.addEventListener('change', function() {
-        const d = new Date(this.value);
-        const md = `${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
-        if ([1,2].includes(d.getDay()) || holidays.includes(md)) {
-          alert(`${md} 為公休日，請選其他日期`);
-          this.value = '';
+      const holidays = ["05/06", "05/20", "05/27"];
+      dateInput.addEventListener('change', () => {
+        const d = new Date(dateInput.value);
+        const md = `${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getDate().toString().padStart(2, '0')}`;
+        if ([1, 2].includes(d.getDay()) || holidays.includes(md)) {
+          alert(`${md} 為公休日，請選其他日期！`);
+          dateInput.value = '';
         }
       });
 
-      // 多選項目
-      const sel = new Set();
+      const selectedServices = new Set();
       document.querySelectorAll('#serviceOptions button').forEach(btn => {
         btn.addEventListener('click', () => {
-          const v = btn.dataset.value;
-          btn.classList.toggle('selected');
-          sel.has(v) ? sel.delete(v) : sel.add(v);
+          const value = btn.dataset.value;
+          if (selectedServices.has(value)) {
+            selectedServices.delete(value);
+            btn.classList.remove('selected');
+          } else {
+            selectedServices.add(value);
+            btn.classList.add('selected');
+          }
         });
       });
 
-      // LIFF 初始化
       liff.init({ liffId: "2006300099-OLXDXZlb" })
         .then(() => liff.getProfile().then(p => {
           document.getElementById('name').value = p.displayName;
         }))
         .catch(console.error);
 
-      // Submit 處理
       document.getElementById('bookingForm').addEventListener('submit', e => {
         e.preventDefault();
         const name = document.getElementById('name').value.trim();
         const phone = document.getElementById('phone').value.trim();
         const date = dateInput.value;
         const time = timeSelect.value;
-        const services = Array.from(sel).join(', ');
-        if (!services) {
-          return alert('請選擇至少一項服務');
-        }
+        const services = Array.from(selectedServices).join(', ');
+        if (!services) return alert('請選擇至少一項服務！');
 
-        // 修正iCal時間格式 (UTC+8轉UTC)
-        const dt = new Date(`${date}T${time}:00+08:00`);
-        const dtstart = dt.toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'')
-        const dtstamp = new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
-
-        // 生成iCal內容
-        const icsContent = [
+        const dtstart = date.replace(/-/g, '') + 'T' + time.replace(':', '') + '00';
+        const uid = Date.now() + '@hange-hair';
+        const dtstamp = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        const icsLines = [
           'BEGIN:VCALENDAR',
           'VERSION:2.0',
+          'PRODID:-//Hange-hair//Booking//TW',
           'BEGIN:VEVENT',
-          `UID:${Date.now()}@hange-hair`,
+          `UID:${uid}`,
           `DTSTAMP:${dtstamp}`,
           `DTSTART:${dtstart}`,
           'DURATION:PT1H',
-          `SUMMARY:預約韓哥 - ${services}`,
-          `DESCRIPTION:姓名：${name}\\n電話：${phone}\\n服務項目：${services}`,
+          'SUMMARY:預約韓哥',
+          `DESCRIPTION:預約服務：${services}\\n電話：${phone}\\n姓名：${name}`,
           'LOCATION:台北市萬華區西門町',
           'END:VEVENT',
           'END:VCALENDAR'
-        ].join('\r\n');
+        ];
+        const icsUri = 'data:text/calendar;charset=utf8,' + encodeURIComponent(icsLines.join('\r\n'));
 
-        // Flex Message結構
         const flexMessage = {
           type: 'flex',
-          altText: '預約確認單',
+          altText: '預約成功通知',
           contents: {
             type: 'bubble',
+            header: {
+              type: 'box', layout: 'vertical', backgroundColor: '#1DB446',
+              contents: [{ type: 'text', text: '預約完成✅', weight: 'bold', color: '#FFFFFF', align: 'center' }]
+            },
             body: {
-              type: 'box',
-              layout: 'vertical',
+              type: 'box', layout: 'vertical', spacing: 'sm',
               contents: [
-                {
-                  type: 'text',
-                  text: '預約確認單',
-                  weight: 'bold',
-                  size: 'xl',
-                  color: '#007bff',
-                  align: 'center'
-                },
-                {
+                { type: 'text', text: '您的預約詳情：', weight: 'bold', size: 'sm' },
+                ...[['姓名', name], ['服務', services], ['日期', date], ['時間', time]].map(([label, val]) => ({
                   type: 'box',
-                  layout: 'vertical',
-                  margin: 'lg',
-                  spacing: 'sm',
+                  layout: 'horizontal',
                   contents: [
-                    createInfoRow('姓名', name),
-                    createInfoRow('電話', phone),
-                    createInfoRow('日期', date),
-                    createInfoRow('時間', time),
-                    createInfoRow('服務', services)
+                    { type: 'text', text: label, size: 'xs', color: '#888888', flex: 2 },
+                    { type: 'text', text: val, size: 'xs', color: '#333333', flex: 5, align: 'end', wrap: true }
                   ]
-                }
+                }))
               ]
             },
             footer: {
-              type: 'box',
-              layout: 'vertical',
-              spacing: 'sm',
+              type: 'box', layout: 'vertical', spacing: 'sm',
               contents: [
                 {
-                  type: 'button',
-                  style: 'primary',
-                  color: '#007bff',
-                  action: {
-                    type: 'uri',
-                    label: '加入行事曆',
-                    uri: `text/calendar;charset=utf8,${encodeURIComponent(icsContent)}`
-                  }
+                  type: 'button', style: 'primary', color: '#1DB446',
+                  action: { type: 'uri', label: '加入行事曆', uri: icsUri }
                 },
                 {
-                  type: 'button',
-                  style: 'secondary',
-                  action: {
-                    type: 'uri',
-                    label: '查看地址',
-                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
-                  }
+                  type: 'button', style: 'secondary',
+                  action: { type: 'uri', label: '查看韓哥髮廊地址', uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9' }
                 }
               ]
             }
           }
         };
 
-        // 發送訊息
         liff.sendMessages([flexMessage])
           .then(() => {
-            alert('預約成功，我們已收到您的資料');
+            alert('預約成功！我們已收到您的資料，韓哥將親自與您確認！');
             liff.closeWindow();
           })
           .catch(err => {
-            alert('發送失敗：' + (err.message || err));
+            alert('發送訊息失敗：' + (err.message || err));
             console.error(err);
           });
       });
-
-      // 創建資訊列函式
-      function createInfoRow(label, value) {
-        return {
-          type: 'box',
-          layout: 'horizontal',
-          contents: [
-            {type: 'text', text: label, size: 'sm', color: '#666', flex: 2},
-            {type: 'text', text: value, size: 'sm', color: '#333', flex: 5, align: 'end'}
-          ]
-        };
-      }
     });
   </script>
 </body>
