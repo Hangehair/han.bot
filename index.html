@@ -167,34 +167,58 @@
           altText: '預約成功通知',
           contents: {
             type: 'bubble',
-            header: {
-              type: 'box', layout: 'vertical', backgroundColor: '#1DB446',
-              contents: [{ type: 'text', text: '預約完成✅', weight: 'bold', color: '#FFFFFF', align: 'center' }]
-            },
+            size: 'mega',
             body: {
-              type: 'box', layout: 'vertical', spacing: 'sm',
+              type: 'box',
+              layout: 'vertical',
+              spacing: 'md',
               contents: [
-                { type: 'text', text: '您的預約詳情：', weight: 'bold', size: 'sm' },
-                ...[['姓名', name], ['服務', services], ['日期', date], ['時間', time]].map(([label, val]) => ({
+                {
+                  type: 'text',
+                  text: '✅ 預約成功',
+                  weight: 'bold',
+                  color: '#1DB446',
+                  size: 'xl',
+                  align: 'center'
+                },
+                {
+                  type: 'separator',
+                  margin: 'md'
+                },
+                ...[['姓名', name], ['服務項目', services], ['預約日期', date], ['預約時間', time]].map(([title, value]) => ({
                   type: 'box',
-                  layout: 'horizontal',
+                  layout: 'vertical',
+                  margin: 'sm',
                   contents: [
-                    { type: 'text', text: label, size: 'xs', color: '#888888', flex: 2 },
-                    { type: 'text', text: val, size: 'xs', color: '#333333', flex: 5, align: 'end', wrap: true }
+                    { type: 'text', text: title, size: 'sm', color: '#888888' },
+                    { type: 'text', text: value, weight: 'bold', size: 'md', wrap: true }
                   ]
                 }))
               ]
             },
             footer: {
-              type: 'box', layout: 'vertical', spacing: 'sm',
+              type: 'box',
+              layout: 'vertical',
+              spacing: 'md',
               contents: [
                 {
-                  type: 'button', style: 'primary', color: '#1DB446',
-                  action: { type: 'uri', label: '加入行事曆', uri: icsUri }
+                  type: 'button',
+                  style: 'primary',
+                  color: '#1DB446',
+                  action: {
+                    type: 'uri',
+                    label: '加入行事曆',
+                    uri: icsUri
+                  }
                 },
                 {
-                  type: 'button', style: 'secondary',
-                  action: { type: 'uri', label: '查看韓哥髮廊地址', uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9' }
+                  type: 'button',
+                  style: 'secondary',
+                  action: {
+                    type: 'uri',
+                    label: '查看韓哥髮廊地址',
+                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
+                  }
                 }
               ]
             }
