@@ -58,7 +58,6 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 生成 12:30~18:00 每半小時時段
       const timeSelect = document.getElementById('time');
       for (let h = 12; h <= 18; h++) {
         for (let m = (h === 12 ? 30 : 0); m < 60; m += 30) {
@@ -67,7 +66,7 @@
           timeSelect.innerHTML += `<option value="${t}">${t}</option>`;
         }
       }
-      // 日期驗證
+
       const dateInput = document.getElementById('date');
       const todayStr = new Date().toISOString().split('T')[0];
       dateInput.min = todayStr;
@@ -80,7 +79,7 @@
           this.value = '';
         }
       });
-      // 多選項目
+
       const sel = new Set();
       document.querySelectorAll('#serviceOptions button').forEach(btn=>{
         btn.addEventListener('click', () => {
@@ -89,14 +88,13 @@
           sel.has(v) ? sel.delete(v) : sel.add(v);
         });
       });
-      // LIFF Init
+
       liff.init({ liffId: "2006300099-OLXDXZlb" })
         .then(() => liff.getProfile().then(p => {
           document.getElementById('name').value = p.displayName;
         }))
         .catch(console.error);
 
-      // Submit
       document.getElementById('bookingForm').addEventListener('submit', e => {
         e.preventDefault();
         const name = document.getElementById('name').value.trim();
@@ -106,19 +104,13 @@
         const services = Array.from(sel).join(', ');
         if (!services) return alert('請選擇至少一項服務！');
 
-        // 計算結束時間（+60 分鐘）
-        const [h,m] = time.split(':').map(Number);
-        const st = new Date(`${date}T${time}:00`);
-        const et = new Date(st.getTime() + 60 * 60000);
-        const endTime = `${et.getHours().toString().padStart(2,'0')}:${et.getMinutes().toString().padStart(2,'0')}`;
-
-        // .ics 下載連結
+        // .ics 連結（不含 duration）
         const title = encodeURIComponent('預約韓哥');
         const desc  = encodeURIComponent(`預約服務：${services}\n電話：${phone}\n姓名：${name}`);
         const loc   = encodeURIComponent('台北市萬華區西門町');
-        const ics   = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}&duration=60&description=${desc}&location=${loc}`;
+        const ics   = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}:00&description=${desc}&location=${loc}`;
 
-        // 簡化版 Flex Message
+        // Flex Message（無結束時間）
         const flexMessage = {
           type: 'flex',
           altText: '預約成功通知',
@@ -137,7 +129,7 @@
                 },
                 {
                   type: 'text',
-                  text: `${date} ${time} ~ ${endTime}`,
+                  text: `${date} ${time}`,
                   margin: 'md',
                   align: 'center'
                 }
