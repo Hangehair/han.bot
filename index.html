@@ -179,74 +179,56 @@
           return alert('請選擇至少一項服務');
         }
 
-        // ICS 檔案內容 (只含開始時間+1小時長度)
-        const dtstart = date.replace(/-/g,'') + 'T' + time.replace(':','') + '00';
-        const uid = Date.now() + '@hange-hair';
+        // 修正iCal時間格式 (UTC+8轉UTC)
+        const dt = new Date(`${date}T${time}:00+08:00`);
+        const dtstart = dt.toISOString().replace(/[-:]/g,'').replace(/\.\d+/,'')
         const dtstamp = new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
-        const icsLines = [
+
+        // 生成iCal內容
+        const icsContent = [
           'BEGIN:VCALENDAR',
           'VERSION:2.0',
-          'PRODID:-//Hange-hair//Booking//TW',
           'BEGIN:VEVENT',
-          `UID:${uid}`,
+          `UID:${Date.now()}@hange-hair`,
           `DTSTAMP:${dtstamp}`,
           `DTSTART:${dtstart}`,
           'DURATION:PT1H',
-          'SUMMARY:預約韓哥',
-          `DESCRIPTION:預約服務：${services}\\n電話：${phone}\\n姓名：${name}`,
+          `SUMMARY:預約韓哥 - ${services}`,
+          `DESCRIPTION:姓名：${name}\\n電話：${phone}\\n服務項目：${services}`,
           'LOCATION:台北市萬華區西門町',
           'END:VEVENT',
           'END:VCALENDAR'
-        ];
-        const icsContent = icsLines.join('\r\n');
-        const icsUri = 'data:text/calendar;charset=utf8,' + encodeURIComponent(icsContent);
+        ].join('\r\n');
 
-        // Flex 訊息 (純文字格式)
+        // Flex Message結構
         const flexMessage = {
           type: 'flex',
-          altText: '預約成功通知',
+          altText: '預約確認單',
           contents: {
             type: 'bubble',
-            header: {
-              type: 'box',
-              layout: 'vertical',
-              backgroundColor: '#1DB446',
-              contents: [{
-                type: 'text',
-                text: '預約完成',
-                weight: 'bold',
-                color: '#FFFFFF',
-                align: 'center'
-              }]
-            },
             body: {
               type: 'box',
               layout: 'vertical',
-              spacing: 'sm',
               contents: [
-                { type: 'text', text: '您的預約詳情：', weight: 'bold', size: 'sm' },
                 {
-                  type: 'box', layout: 'horizontal', contents: [
-                    { type: 'text', text: '姓名', size: 'xs', color: '#888888', flex: 2 },
-                    { type: 'text', text: name, size: 'xs', color: '#333333', flex: 5, align: 'end' }
-                  ]
+                  type: 'text',
+                  text: '預約確認單',
+                  weight: 'bold',
+                  size: 'xl',
+                  color: '#007bff',
+                  align: 'center'
                 },
                 {
-                  type: 'box', layout: 'horizontal', contents: [
-                    { type: 'text', text: '服務', size: 'xs', color: '#888888', flex: 2 },
-                    { type: 'text', text: services, size: 'xs', color: '#333333', flex: 5, align: 'end', wrap: true }
-                  ]
-                },
-                {
-                  type: 'box', layout: 'horizontal', contents: [
-                    { type: 'text', text: '日期', size: 'xs', color: '#888888', flex: 2 },
-                    { type: 'text', text: date, size: 'xs', color: '#333333', flex: 5, align: 'end' }
-                  ]
-                },
-                {
-                  type: 'box', layout: 'horizontal', contents: [
-                    { type: 'text', text: '時間', size: 'xs', color: '#888888', flex: 2 },
-                    { type: 'text', text: time, size: 'xs', color: '#333333', flex: 5, align: 'end' }
+                  type: 'box',
+                  layout: 'vertical',
+                  margin: 'lg',
+                  spacing: 'sm',
+                  contents: [
+                    createInfoRow('姓名', name),
+                    createInfoRow('電話', phone),
+                    createInfoRow('日期', date),
+                    createInfoRow('時間', time),
+                    createInfoRow('服務', services)
                   ]
                 }
               ]
@@ -259,29 +241,50 @@
                 {
                   type: 'button',
                   style: 'primary',
-                  color: '#1DB446',
-                  action: { type: 'uri', label: '加入行事曆', uri: icsUri }
+                  color: '#007bff',
+                  action: {
+                    type: 'uri',
+                    label: '加入行事曆',
+                    uri: `text/calendar;charset=utf8,${encodeURIComponent(icsContent)}`
+                  }
                 },
                 {
                   type: 'button',
                   style: 'secondary',
-                  action: { type: 'uri', label: '查看韓哥髮廊地址', uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9' }
+                  action: {
+                    type: 'uri',
+                    label: '查看地址',
+                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
+                  }
                 }
               ]
             }
           }
         };
 
+        // 發送訊息
         liff.sendMessages([flexMessage])
           .then(() => {
-            alert('預約成功，我們已收到您的資料，韓哥將親自與您確認');
+            alert('預約成功，我們已收到您的資料');
             liff.closeWindow();
           })
           .catch(err => {
-            alert('發送訊息失敗：' + (err.message || err));
+            alert('發送失敗：' + (err.message || err));
             console.error(err);
           });
       });
+
+      // 創建資訊列函式
+      function createInfoRow(label, value) {
+        return {
+          type: 'box',
+          layout: 'horizontal',
+          contents: [
+            {type: 'text', text: label, size: 'sm', color: '#666', flex: 2},
+            {type: 'text', text: value, size: 'sm', color: '#333', flex: 5, align: 'end'}
+          ]
+        };
+      }
     });
   </script>
 </body>
