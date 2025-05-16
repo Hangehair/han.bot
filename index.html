@@ -7,8 +7,11 @@
   <style>
     body {
       font-family: 'Arial', sans-serif;
-      display: flex; justify-content: center; align-items: center;
-      min-height: 100vh; margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     }
     .container {
@@ -16,52 +19,84 @@
       border-radius: 15px;
       background: #fff;
       box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-      width: 100%; max-width: 450px;
+      width: 100%;
+      max-width: 450px;
     }
     .notice {
       background: linear-gradient(90deg, #f8fafc 80%, #e3f2fd 100%);
       border-left: 4px solid #007bff;
-      padding: 15px; margin-bottom: 20px;
+      padding: 15px;
+      margin-bottom: 20px;
       border-radius: 8px;
-      color: #2d3748; font-size: 14px; line-height: 1.6;
+      color: #2d3748;
+      font-size: 14px;
+      line-height: 1.6;
     }
-    form { display: flex; flex-direction: column; gap: 12px; }
-    label { font-weight: 600; color: #2d3748; font-size: 15px; }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    label {
+      font-weight: 600;
+      color: #2d3748;
+      font-size: 15px;
+    }
     input, select, button {
-      padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px;
-      font-size: 15px; transition: all .3s ease;
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+      transition: all .3s ease;
     }
     input:focus, select:focus {
-      border-color: #007bff; box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+      border-color: #007bff;
+      box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
     }
     button {
-      background: #fff; color: #007bff; font-weight: 600;
-      cursor: pointer; border: 2px solid #007bff;
+      background: #fff;
+      color: #007bff;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid #007bff;
     }
-    button:hover { background: #e3f2fd; }
+    button:hover {
+      background: #e3f2fd;
+    }
     .multi-select {
-      display: grid; grid-template-columns: repeat(2,1fr); gap: 10px;
+      display: grid;
+      grid-template-columns: repeat(2,1fr);
+      gap: 10px;
     }
     .multi-select button {
-      padding: 12px; border: 1px solid #007bff; background: #fff;
-      color: #007bff; border-radius: 8px; transition: all .2s;
+      padding: 12px;
+      border: 1px solid #007bff;
+      background: #fff;
+      color: #007bff;
+      border-radius: 8px;
+      transition: all .2s;
     }
     .multi-select button.selected {
-      background: #007bff; color: #fff;
+      background: #007bff;
+      color: #fff;
     }
     .multi-select button:hover:not(.selected) {
       background: #e3f2fd;
     }
-    .note { font-size: 12px; color: #718096; margin-top: -8px; }
+    .note {
+      font-size: 12px;
+      color: #718096;
+      margin-top: -8px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="notice">
-      <strong>📢 預約公告</strong><br>
-      ✨ 每週星期一、星期二公休<br>
-      ✨ 週三～週日預約時段：12:30 - 18:00<br>
-      ✨ 其他時段需求歡迎私訊討論！
+      <strong>預約公告</strong><br>
+      每週星期一、星期二公休<br>
+      週三～週日預約時段：12:30 - 18:00<br>
+      其他時段需求歡迎私訊討論
     </div>
     <form id="bookingForm">
       <label for="name">1. 姓名：</label>
@@ -106,11 +141,11 @@
       const dateInput = document.getElementById('date');
       dateInput.min = new Date().toISOString().split('T')[0];
       const holidays = ["05/06","05/20","05/27"];
-      dateInput.addEventListener('change', function(){
+      dateInput.addEventListener('change', function() {
         const d = new Date(this.value);
         const md = `${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
         if ([1,2].includes(d.getDay()) || holidays.includes(md)) {
-          alert(`${md} 為公休日，請選其他日期！`);
+          alert(`${md} 為公休日，請選其他日期`);
           this.value = '';
         }
       });
@@ -127,9 +162,10 @@
 
       // LIFF 初始化
       liff.init({ liffId: "2006300099-OLXDXZlb" })
-        .then(() => liff.getProfile()
-          .then(p => document.getElementById('name').value = p.displayName)
-        ).catch(console.error);
+        .then(() => liff.getProfile().then(p => {
+          document.getElementById('name').value = p.displayName;
+        }))
+        .catch(console.error);
 
       // Submit 處理
       document.getElementById('bookingForm').addEventListener('submit', e => {
@@ -139,9 +175,11 @@
         const date = dateInput.value;
         const time = timeSelect.value;
         const services = Array.from(sel).join(', ');
-        if (!services) return alert('請選擇至少一項服務！');
+        if (!services) {
+          return alert('請選擇至少一項服務');
+        }
 
-        // 構建 ICS 檔案（只含開始時間+1小時長度，不含結束時間）
+        // ICS 檔案內容 (只含開始時間+1小時長度)
         const dtstart = date.replace(/-/g,'') + 'T' + time.replace(':','') + '00';
         const uid = Date.now() + '@hange-hair';
         const dtstamp = new Date().toISOString().replace(/[-:]/g,'').split('.')[0] + 'Z';
@@ -163,24 +201,28 @@
         const icsContent = icsLines.join('\r\n');
         const icsUri = 'data:text/calendar;charset=utf8,' + encodeURIComponent(icsContent);
 
-        // 優化版 Flex 訊息
+        // Flex 訊息 (純文字格式)
         const flexMessage = {
           type: 'flex',
           altText: '預約成功通知',
           contents: {
             type: 'bubble',
             header: {
-              type: 'box', layout: 'vertical', backgroundColor: '#1DB446',
+              type: 'box',
+              layout: 'vertical',
+              backgroundColor: '#1DB446',
               contents: [{
                 type: 'text',
-                text: '預約完成✅',
+                text: '預約完成',
                 weight: 'bold',
                 color: '#FFFFFF',
                 align: 'center'
               }]
             },
             body: {
-              type: 'box', layout: 'vertical', spacing: 'sm',
+              type: 'box',
+              layout: 'vertical',
+              spacing: 'sm',
               contents: [
                 { type: 'text', text: '您的預約詳情：', weight: 'bold', size: 'sm' },
                 {
@@ -210,14 +252,19 @@
               ]
             },
             footer: {
-              type: 'box', layout: 'vertical', spacing: 'sm',
+              type: 'box',
+              layout: 'vertical',
+              spacing: 'sm',
               contents: [
                 {
-                  type: 'button', style: 'primary', color: '#1DB446',
+                  type: 'button',
+                  style: 'primary',
+                  color: '#1DB446',
                   action: { type: 'uri', label: '加入行事曆', uri: icsUri }
                 },
                 {
-                  type: 'button', style: 'secondary',
+                  type: 'button',
+                  style: 'secondary',
                   action: { type: 'uri', label: '查看韓哥髮廊地址', uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9' }
                 }
               ]
@@ -227,7 +274,7 @@
 
         liff.sendMessages([flexMessage])
           .then(() => {
-            alert('預約成功！我們已收到您的資料，韓哥將親自與您確認！');
+            alert('預約成功，我們已收到您的資料，韓哥將親自與您確認');
             liff.closeWindow();
           })
           .catch(err => {
