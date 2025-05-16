@@ -2,7 +2,6 @@
 const { createEvent } = require('ics');
 
 module.exports = async (req, res) => {
-  // 取得 query string 參數
   const {
     title = '預約韓哥',
     start = '2025-05-20T13:30',
@@ -34,19 +33,21 @@ module.exports = async (req, res) => {
   alarmDate.setDate(alarmDate.getDate() - 1);
   alarmDate.setHours(11, 30, 0, 0);
 
+  const alarmTrigger = [
+    alarmDate.getFullYear(),
+    alarmDate.getMonth() + 1,
+    alarmDate.getDate(),
+    alarmDate.getHours(),
+    alarmDate.getMinutes()
+  ];
+
   const alarms = [
     {
       action: 'display',
       description: '預約提醒：明天有預約韓哥',
       trigger: {
         type: 'date-time',
-        value: [
-          alarmDate.getFullYear(),
-          alarmDate.getMonth() + 1,
-          alarmDate.getDate(),
-          alarmDate.getHours(),
-          alarmDate.getMinutes()
-        ]
+        value: alarmTrigger
       }
     }
   ];
@@ -57,7 +58,11 @@ module.exports = async (req, res) => {
     location,
     start: startArr,
     end: endArr,
-    alarms
+    alarms,
+    startInputType: 'local',
+    startOutputType: 'local',
+    productId: '//HangeHair//Booking//TW',
+    timezone: 'Asia/Taipei' // **關鍵設定**
   };
 
   return new Promise((resolve) => {
