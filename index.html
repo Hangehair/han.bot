@@ -105,9 +105,9 @@
         if (!services) return alert('請選擇至少一項服務！');
 
         // .ics 日曆連結
-        const title = encodeURIComponent('預約韓哥');
+        const title = encodeURIComponent('預約：${name}${services}');
         const desc  = encodeURIComponent(`預約服務：${services}\n電話：${phone}\n姓名：${name}`);
-        const loc   = encodeURIComponent('台北市萬華區西門町');
+        const loc   = encodeURIComponent('台北市萬華區漢中街109-2號2樓');
         const ics   = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}:00&description=${desc}&location=${loc}`;
 
         const flexMessage = {
