@@ -1,1 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>接髮評估小幫手</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>✨ 接髮方案評估 ✨</h1>
+    <form id="quiz-form">
+      <div class="question">
+        <label>1️⃣ 現在的髮型困擾是？</label>
+        <select name="q1">
+          <option value="髮量少">髮量少</option>
+          <option value="長度不夠">長度不夠</option>
+          <option value="斷層不自然">斷層不自然</option>
+          <option value="其他">其他（請自述）</option>
+        </select>
+        <input type="text" name="q1_other" placeholder="請填寫">
+      </div>
 
+      <div class="question">
+        <label>2️⃣ 想要達成的效果？</label>
+        <select name="q2">
+          <option value="加厚">加厚</option>
+          <option value="加長">加長</option>
+          <option value="特殊造型">特殊造型</option>
+          <option value="其他">其他（請自述）</option>
+        </select>
+        <input type="text" name="q2_other" placeholder="請填寫">
+      </div>
+
+      <div class="question">
+        <label>3️⃣ 是否有接髮經驗？</label>
+        <select name="q3">
+          <option value="沒有">沒有</option>
+          <option value="有，但經驗不佳">有，但經驗不佳</option>
+          <option value="有，覺得效果還不錯">有，覺得效果還不錯</option>
+        </select>
+      </div>
+
+      <div class="question">
+        <label>4️⃣ 為什麼這次想接髮？</label>
+        <select name="q4">
+          <option value="重要活動（婚禮/拍照等）">重要活動（婚禮/拍照等）</option>
+          <option value="單純想改變風格">單純想改變風格</option>
+          <option value="長期接髮族">長期接髮族</option>
+          <option value="其他">其他（請自述）</option>
+        </select>
+        <input type="text" name="q4_other" placeholder="請填寫">
+      </div>
+
+      <div class="question">
+        <label>5️⃣ 平常會染燙嗎？</label>
+        <select name="q5">
+          <option value="會，定期染燙">會，定期染燙</option>
+          <option value="偶爾染燙">偶爾染燙</option>
+          <option value="不會染燙">不會染燙</option>
+        </select>
+      </div>
+
+      <div class="question">
+        <label>6️⃣ 最快想接髮的時間？</label>
+        <select name="q6">
+          <option value="1個禮拜內">1個禮拜內</option>
+          <option value="這個月內">這個月內</option>
+          <option value="下個月">下個月</option>
+          <option value="我還在評估">我還在評估</option>
+        </select>
+      </div>
+
+      <button type="submit">✨ 送出並查看推薦方案 ✨</button>
+    </form>
+  </div>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
