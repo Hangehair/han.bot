@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  liff.init({ liffId: "YOUR_LIFF_ID" }).then(() => {
+  liff.init({ liffId: "2007657502-N6Xb70bg" }).then(() => {
     console.log("LIFF initialized");
   });
 
