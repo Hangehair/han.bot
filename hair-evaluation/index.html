@@ -138,7 +138,7 @@
         </select>
       </div>
 
-      <div class="question" style="background: #fff0f3; padding: 20px; border: 2px solid #ff9ab2; border-radius: 8px;">
+      <div class="question">
         <label>8️⃣ 髮質狀況？</label>
         <select name="hairQuality">
           <option value="頭髮粗硬（髮量多）">頭髮粗硬（髮量多）</option>
@@ -184,27 +184,23 @@
           想接髮原因: getValue("q4"),
           染燙習慣: getValue("q5"),
           想接髮時間: getValue("q6"),
-          髮質狀況: form.elements["hairQuality"].value,
-          預算範圍: form.elements["budget"].value
+          預算範圍: form.elements["budget"].value,
+          髮質狀況: form.elements["hairQuality"].value
         };
 
-        let 推薦 = "", 說明 = "";
+        let 推薦內容 = "";
         switch (data["預算範圍"]) {
           case "12000":
-            推薦 = "天羽款式｜鑽石髮質";
-            說明 = "💎 鑽石髮質：亮澤柔順、適合新手體驗接髮";
+            推薦內容 = "推薦方案：天羽款式｜鑽石髮質\n💎 鑽石髮質：亮澤柔順、適合新手體驗接髮";
             break;
           case "15000":
-            推薦 = "天羽款式｜處女髮質";
-            說明 = "🌸 處女髮質：自然未加工、可染燙修剪";
+            推薦內容 = "推薦方案：天羽款式｜處女髮質\n🌸 處女髮質：自然未加工、可染燙修剪";
             break;
           case "18000":
-            推薦 = "天羽款式｜仙女髮質";
-            說明 = "✨ 仙女髮質：頂級絲滑髮源、超高維持度";
+            推薦內容 = "推薦方案：天羽款式｜仙女髮質\n✨ 仙女髮質：頂級絲滑髮源、超高維持度";
             break;
           default:
-            推薦 = "韓哥評估後推薦";
-            說明 = "🔍 將由專人評估你的頭髮狀況與預算後推薦最適合的接髮方案";
+            推薦內容 = "推薦方案：韓哥評估後推薦\n🔍 將由專人評估你的頭髮狀況與預算後推薦最適合的接髮方案";
         }
 
         const flex = {
@@ -218,8 +214,7 @@
               spacing: "md",
               contents: [
                 { type: "text", text: "💡 接髮評估結果", weight: "bold", size: "lg", color: "#c84d64" },
-                { type: "text", text: `推薦方案：${推薦}`, wrap: true, color: "#333" },
-                { type: "text", text: 說明, wrap: true, size: "sm", color: "#666" },
+                { type: "text", text: 推薦內容, wrap: true, color: "#333" },
                 { type: "separator", margin: "md" },
                 { type: "text", text: "📝 你填寫的內容", weight: "bold", margin: "md" },
                 ...Object.entries(data).map(([k, v]) => ({
