@@ -25,6 +25,13 @@ h1 {
   margin-bottom: 20px;
 }
 
+.question.highlight {
+  border: 2px dashed #c84d64;
+  padding: 16px;
+  border-radius: 10px;
+  background-color: #fff0f4;
+}
+
 label {
   display: block;
   font-weight: bold;
