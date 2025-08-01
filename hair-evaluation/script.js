@@ -8,17 +8,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const form = document.getElementById('quiz-form');
 
-  // 條件顯示輸入欄位
-  const conditionalFields = ['q1', 'q2', 'q4'];
-  conditionalFields.forEach(name => {
+  // 顯示/隱藏「其他」輸入框
+  const toggleOtherInputs = (name) => {
     const select = form.elements[name];
     const input = form.elements[`${name}_other`];
-    const toggleInput = () => {
+    const updateDisplay = () => {
       input.style.display = select.value === '其他' ? 'block' : 'none';
     };
-    select.addEventListener('change', toggleInput);
-    toggleInput();
-  });
+    select.addEventListener('change', updateDisplay);
+    updateDisplay();
+  };
+
+  ['q1', 'q2', 'q4'].forEach(toggleOtherInputs);
 
   form.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -26,18 +27,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const getFormValue = (name) => {
       const val = form.elements[name].value;
       const other = form.elements[`${name}_other`] ? form.elements[`${name}_other`].value : '';
-      return val === "其他" ? other : val;
+      return val === '其他' ? other : val;
     };
 
     const formData = {
-      髮型困擾: getFormValue("q1"),
-      接髮效果: getFormValue("q2"),
-      接髮經驗: getFormValue("q3"),
-      想接髮原因: getFormValue("q4"),
-      染燙習慣: getFormValue("q5"),
-      想接髮時間: getFormValue("q6"),
-      預算範圍: form.elements["q7"].value,
-      髮質狀況: form.elements["q8"].value
+      髮型困擾: getFormValue('q1'),
+      接髮效果: getFormValue('q2'),
+      接髮經驗: getFormValue('q3'),
+      想接髮原因: getFormValue('q4'),
+      染燙習慣: getFormValue('q5'),
+      想接髮時間: getFormValue('q6'),
+      預算範圍: getFormValue('q7'),
+      髮質狀況: getFormValue('q8')
     };
 
     const determineRecommendation = (budget) => {
