@@ -56,49 +56,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const recommendation = determineRecommendation(formData["預算範圍"]);
 
     const flexMessage = {
-      type: "flex",
-      altText: "你的接髮推薦方案已送出！",
-      contents: {
-        type: "bubble",
-        body: {
-          type: "box",
-          layout: "vertical",
-          spacing: "md",
-          contents: [
-            { type: "text", text: "🎀 接髮推薦結果", weight: "bold", size: "lg", color: "#c84d64" },
-            { type: "text", text: `💡 推薦款式：${recommendation.name}`, wrap: true, size: "md" },
-            { type: "text", text: `📘 說明：${recommendation.note}`, wrap: true, size: "sm", color: "#888888" },
-            { type: "separator", margin: "md" },
-            { type: "text", text: "📝 你提供的資訊：", weight: "bold", margin: "md" },
-            ...Object.entries(formData).map(([k, v]) => ({
-              type: "text", text: `${k}：${v}`, wrap: true, size: "sm"
-            }))
-          ]
-        },
-        footer: {
-          type: "box",
-          layout: "vertical",
-          spacing: "sm",
-          contents: [
-            {
-              type: "button",
-              action: { type: "message", label: "查看款式價位", text: "接髮價位" },
-              style: "primary",
-              color: "#ff7c9e"
-            }
-          ]
+  type: "flex",
+  altText: "這是測試 Flex",
+  contents: {
+    type: "bubble",
+    body: {
+      type: "box",
+      layout: "vertical",
+      contents: [
+        {
+          type: "text",
+          text: "Flex 測試成功！",
+          weight: "bold",
+          size: "lg",
+          color: "#1DB446"
         }
-      }
-    };
+      ]
+    }
+  }
+};
 
-    liff.sendMessages([flexMessage])
-      .then(() => {
-        alert("已成功傳送結果至聊天室！");
-        liff.closeWindow();
-      })
-      .catch((err) => {
-        console.error("傳送訊息失敗：", err);
-        alert("傳送訊息失敗，請稍後再試！");
-      });
+liff.sendMessages([flexMessage])
+  .then(() => {
+    alert("✅ Flex 傳送成功！");
+    liff.closeWindow();
+  })
+  .catch((err) => {
+    console.error("❌ 傳送失敗：", err);
+    alert("❌ 傳送失敗：" + JSON.stringify(err));
   });
-});
