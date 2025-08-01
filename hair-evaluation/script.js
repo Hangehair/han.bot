@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const form = document.getElementById('quiz-form');
 
-  // 顯示/隱藏「其他」輸入框
   const toggleOtherInputs = (name) => {
     const select = form.elements[name];
     const input = form.elements[`${name}_other`];
@@ -66,41 +65,13 @@ document.addEventListener('DOMContentLoaded', () => {
           layout: "vertical",
           spacing: "md",
           contents: [
-            {
-              type: "text",
-              text: "🎀 接髮推薦結果",
-              weight: "bold",
-              size: "lg",
-              color: "#c84d64"
-            },
-            {
-              type: "text",
-              text: `💡 推薦款式：${recommendation.name}`,
-              wrap: true,
-              size: "md"
-            },
-            {
-              type: "text",
-              text: `📘 說明：${recommendation.note}`,
-              wrap: true,
-              size: "sm",
-              color: "#888888"
-            },
-            {
-              type: "separator",
-              margin: "md"
-            },
-            {
-              type: "text",
-              text: "📝 你提供的資訊：",
-              weight: "bold",
-              margin: "md"
-            },
-            ...Object.entries(formData).map(([key, value]) => ({
-              type: "text",
-              text: `${key}：${value}`,
-              wrap: true,
-              size: "sm"
+            { type: "text", text: "🎀 接髮推薦結果", weight: "bold", size: "lg", color: "#c84d64" },
+            { type: "text", text: `💡 推薦款式：${recommendation.name}`, wrap: true, size: "md" },
+            { type: "text", text: `📘 說明：${recommendation.note}`, wrap: true, size: "sm", color: "#888888" },
+            { type: "separator", margin: "md" },
+            { type: "text", text: "📝 你提供的資訊：", weight: "bold", margin: "md" },
+            ...Object.entries(formData).map(([k, v]) => ({
+              type: "text", text: `${k}：${v}`, wrap: true, size: "sm"
             }))
           ]
         },
@@ -111,11 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
           contents: [
             {
               type: "button",
-              action: {
-                type: "message",
-                label: "查看款式價位",
-                text: "接髮價位"
-              },
+              action: { type: "message", label: "查看款式價位", text: "接髮價位" },
               style: "primary",
               color: "#ff7c9e"
             }
