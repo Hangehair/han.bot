@@ -1,234 +1,155 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>接髮評估小幫手</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>台北西門町接髮專家Hange韓哥預約系統</title>
   <style>
-    body {
-      font-family: 'Helvetica Neue', sans-serif;
-      background: #fff9f9;
-      padding: 20px;
-      color: #333;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      padding: 24px;
-    }
-
-    h1 {
-      font-size: 24px;
-      color: #c84d64;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .question {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 6px;
-      color: #444;
-    }
-
-    select, input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      margin-top: 4px;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #ff7c9e;
-      border: none;
-      color: white;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #e96a8c;
-    }
+    body { font-family: 'Arial', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%); }
+    .container { padding:25px; border-radius:15px; background:#fff; box-shadow:0 6px 20px rgba(0,0,0,0.08); width:100%; max-width:450px; }
+    .notice { background:linear-gradient(90deg,#f8fafc 80%,#e3f2fd 100%); border-left:4px solid #007bff; padding:15px; margin-bottom:20px; border-radius:8px; color:#2d3748; font-size:14px; line-height:1.6; }
+    form { display:flex; flex-direction:column; gap:12px; }
+    label { font-weight:600; color:#2d3748; font-size:15px; }
+    input, select, button { padding:12px; border:1px solid #e2e8f0; border-radius:8px; font-size:15px; transition:all .3s ease; }
+    input:focus, select:focus { border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.1); }
+    button { background:#fff; color:#007bff; font-weight:600; cursor:pointer; border:2px solid #007bff; }
+    button:hover { background:#e3f2fd; }
+    .multi-select { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+    .multi-select button { padding:12px; border:1px solid #007bff; background:#fff; color:#007bff; border-radius:8px; transition:all .2s; }
+    .multi-select button.selected { background:#007bff; color:#fff; }
+    .multi-select button:hover:not(.selected){ background:#e3f2fd; }
+    .note { font-size:12px; color:#718096; margin-top:-8px; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>✨ 接髮方案評估 ✨</h1>
-    <form id="quiz-form">
-      <div class="question">
-        <label>1️⃣ 現在的髮型困擾是？</label>
-        <select name="q1">
-          <option value="髮量少">髮量少</option>
-          <option value="長度不夠">長度不夠</option>
-          <option value="斷層不自然">斷層不自然</option>
-          <option value="其他">其他（請自述）</option>
-        </select>
-        <input type="text" name="q1_other" placeholder="請填寫">
+    <div class="notice">
+      <strong>📢 預約公告</strong><br>
+      ✨ 每週星期一、星期二公休<br>
+      ✨ 週三～週日預約時段：12:30 - 18:00<br>
+      ✨ 其他時段需求歡迎私訊討論！
+    </div>
+    <form id="bookingForm">
+      <label for="name">1. 姓名：</label>
+      <input type="text" id="name" placeholder="您的姓名" required>
+      <label for="phone">2. 電話：</label>
+      <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
+      <label for="date">3. 預約日期：</label>
+      <input type="date" id="date" required>
+      <label for="time">4. 預約時段：</label>
+      <select id="time" required>
+        <option value="" disabled selected>請選擇時段</option>
+      </select>
+      <label>5. 預約項目：</label>
+      <div class="multi-select" id="serviceOptions">
+        <button type="button" data-value="接髮">接髮</button>
+        <button type="button" data-value="染髮">染髮</button>
+        <button type="button" data-value="燙髮">燙髮</button>
+        <button type="button" data-value="剪髮">剪髮</button>
+        <button type="button" data-value="洗髮">洗髮</button>
+        <button type="button" data-value="頭髮護理">頭髮護理</button>
+        <button type="button" data-value="頭皮護理">頭皮護理</button>
       </div>
-
-      <div class="question">
-        <label>2️⃣ 想要達成的效果？</label>
-        <select name="q2">
-          <option value="加厚">加厚</option>
-          <option value="加長">加長</option>
-          <option value="特殊造型">特殊造型</option>
-          <option value="其他">其他（請自述）</option>
-        </select>
-        <input type="text" name="q2_other" placeholder="請填寫">
-      </div>
-
-      <div class="question">
-        <label>3️⃣ 是否有接髮經驗？</label>
-        <select name="q3">
-          <option value="沒有">沒有</option>
-          <option value="有，但經驗不佳">有，但經驗不佳</option>
-          <option value="有，覺得效果還不錯">有，覺得效果還不錯</option>
-        </select>
-      </div>
-
-      <div class="question">
-        <label>4️⃣ 為什麼這次想接髮？</label>
-        <select name="q4">
-          <option value="重要活動（婚禮/拍照等）">重要活動（婚禮/拍照等）</option>
-          <option value="單純想改變風格">單純想改變風格</option>
-          <option value="長期接髮族">長期接髮族</option>
-          <option value="其他">其他（請自述）</option>
-        </select>
-        <input type="text" name="q4_other" placeholder="請填寫">
-      </div>
-
-      <div class="question">
-        <label>5️⃣ 平常會染燙嗎？</label>
-        <select name="q5">
-          <option value="會，定期染燙">會，定期染燙</option>
-          <option value="偶爾染燙">偶爾染燙</option>
-          <option value="不會染燙">不會染燙</option>
-        </select>
-      </div>
-
-      <div class="question">
-        <label>6️⃣ 最快想接髮的時間？</label>
-        <select name="q6">
-          <option value="1個禮拜內">1個禮拜內</option>
-          <option value="這個月內">這個月內</option>
-          <option value="下個月">下個月</option>
-          <option value="我還在評估">我還在評估</option>
-        </select>
-      </div>
-
-      <div class="question">
-        <label>7️⃣ 預算範圍？</label>
-        <select name="budget">
-          <option value="12000">12000 元</option>
-          <option value="15000">15000 元</option>
-          <option value="18000">18000 元</option>
-          <option value="推薦合適款式">推薦合適款式</option>
-        </select>
-      </div>
-
-      <div class="question">
-        <label>8️⃣ 髮質狀況？</label>
-        <select name="hairQuality">
-          <option value="頭髮粗硬（髮量多）">頭髮粗硬（髮量多）</option>
-          <option value="頭髮細軟（髮量少）">頭髮細軟（髮量少）</option>
-          <option value="頭髮粗細適中（髮量適中）">頭髮粗細適中（髮量適中）</option>
-        </select>
-      </div>
-
-      <button type="submit">✨ 送出並查看推薦方案 ✨</button>
+      <span class="note">* 可複選多個項目</span>
+      <button type="submit">立即預約</button>
     </form>
   </div>
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 初始化 LIFF
-      liff.init({ liffId: "2007657502-N6Xb70bg" })
-        .then(() => {
-          console.log("LIFF initialized");
-        })
-        .catch((err) => {
-          console.error("LIFF 初始化失敗：", err);
-          alert("LIFF 初始化失敗，請稍後再試！");
-        });
+      const timeSelect = document.getElementById('time');
+      for (let h = 12; h <= 18; h++) {
+        for (let m = (h === 12 ? 30 : 0); m < 60; m += 30) {
+          if (h === 18 && m >= 30) break;
+          const t = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
+          timeSelect.innerHTML += `<option value="${t}">${t}</option>`;
+        }
+      }
 
-      const form = document.getElementById('quiz-form');
-
-      // 條件顯示輸入欄位
-      ['q1', 'q2', 'q4'].forEach(name => {
-        const select = form.elements[name];
-        const input = form.elements[`${name}_other`];
-        const toggle = () => input.style.display = select.value === '其他' ? 'block' : 'none';
-        select.addEventListener('change', toggle);
-        toggle();
+      const dateInput = document.getElementById('date');
+      const todayStr = new Date().toISOString().split('T')[0];
+      dateInput.min = todayStr;
+      const holidays = ["05/06","05/20","05/27"];
+      dateInput.addEventListener('change', function(){
+        const d = new Date(this.value);
+        const md = `${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
+        if ([1,2].includes(d.getDay()) || holidays.includes(md)) {
+          alert(`${md} 為公休日，請選其他日期！`);
+          this.value = '';
+        }
       });
 
-      form.addEventListener('submit', function (event) {
-        event.preventDefault();
+      const sel = new Set();
+      document.querySelectorAll('#serviceOptions button').forEach(btn=>{
+        btn.addEventListener('click', () => {
+          const v = btn.dataset.value;
+          btn.classList.toggle('selected');
+          sel.has(v) ? sel.delete(v) : sel.add(v);
+        });
+      });
 
-        const getFormValue = (name) => {
-          const selectedValue = form.elements[name].value;
-          const otherValue = form.elements[`${name}_other`] ? form.elements[`${name}_other`].value : '';
-          return selectedValue === "其他" ? otherValue : selectedValue;
-        };
+      liff.init({ liffId: "2006300099-OLXDXZlb" })
+        .then(() => liff.getProfile().then(p => {
+          document.getElementById('name').value = p.displayName;
+        }))
+        .catch(console.error);
 
-        const formData = {
-          髮型困擾: getFormValue("q1"),
-          接髮效果: getFormValue("q2"),
-          接髮經驗: getFormValue("q3"),
-          想接髮原因: getFormValue("q4"),
-          染燙習慣: getFormValue("q5"),
-          想接髮時間: getFormValue("q6"),
-          預算範圍: form.elements["budget"].value,
-          髮質狀況: form.elements["hairQuality"].value
-        };
+      document.getElementById('bookingForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const name = document.getElementById('name').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const date = dateInput.value;
+        const time = timeSelect.value;
+        const services = Array.from(sel).join(', ');
+        if (!services) return alert('請選擇至少一項服務！');
 
-        const determineHairRecommendation = (budget) => {
-          switch (budget) {
-            case "12000":
-              return { name: "天羽款式｜鑽石髮質", desc: "💎 鑽石髮質：亮澤柔順，適合新手體驗接髮" };
-            case "15000":
-              return { name: "天羽款式｜處女髮質", desc: "🌸 處女髮質：自然未加工，可染燙修剪" };
-            case "18000":
-              return { name: "天羽款式｜仙女髮質", desc: "✨ 仙女髮質：頂級絲滑髮源，超高維持度" };
-            default:
-              return { name: "韓哥評估後推薦", desc: "🔍 根據您的髮況與需求提供最適接髮方案" };
-          }
-        };
-
-        const { name, desc } = determineHairRecommendation(formData["預算範圍"]);
+        // .ics 日曆連結
+        const title = encodeURIComponent('預約韓哥');
+        const desc  = encodeURIComponent(`預約服務：${services}\n電話：${phone}\n姓名：${name}`);
+        const loc   = encodeURIComponent('台北市萬華區西門町');
+        const ics   = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}:00&description=${desc}&location=${loc}`;
 
         const flexMessage = {
-          type: "flex",
-          altText: "你的接髮推薦方案已送出！",
+          type: 'flex',
+          altText: '預約成功通知',
           contents: {
-            type: "bubble",
+            type: 'bubble',
             body: {
-              type: "box",
-              layout: "vertical",
-              spacing: "md",
+              type: 'box',
+              layout: 'vertical',
               contents: [
-                { type: "text", text: "接髮評估結果", weight: "bold", size: "lg", color: "#c84d64" },
-                { type: "text", text: `推薦髮質：${name}`, wrap: true, color: "#111111" },
-                { type: "text", text: desc, wrap: true, size: "sm", color: "#666" },
-                { type: "text", text: "你的填寫內容：", weight: "bold", margin: "md" },
-                ...Object.entries(formData).map(([key, value]) => ({
-                  type: "text",
-                  text: `${key}：${value}`,
-                  wrap: true
-                }))
+                { type: 'text', text: '🎉 預約成功！', weight: 'bold', size: 'lg', align: 'center' },
+                { type: 'text', text: `${date} ${time}`, align: 'center', margin: 'md' },
+                { type: 'separator', margin: 'md' },
+                { type: 'text', text: `姓名：${name}`, margin: 'md' },
+                { type: 'text', text: `電話：${phone}`, margin: 'sm' },
+                { type: 'text', text: `項目：${services}`, wrap: true, margin: 'sm' }
+              ]
+            },
+            footer: {
+              type: 'box',
+              layout: 'vertical',
+              spacing: 'sm',
+              contents: [
+                {
+                  type: 'button',
+                  style: 'primary',
+                  action: {
+                    type: 'uri',
+                    label: '加入手機日曆',
+                    uri: ics
+                  }
+                },
+                {
+                  type: 'button',
+                  style: 'secondary',
+                  action: {
+                    type: 'uri',
+                    label: '查看韓哥髮廊地址',
+                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
+                  }
+                }
               ]
             }
           }
@@ -236,12 +157,12 @@
 
         liff.sendMessages([flexMessage])
           .then(() => {
-            alert("已成功傳送結果至聊天室！");
+            alert('預約成功！我們已收到您的資料，韓哥將親自與您確認！');
             liff.closeWindow();
           })
-          .catch((err) => {
-            console.error("傳送訊息失敗：", err);
-            alert("傳送訊息失敗，請稍後再試！");
+          .catch(err => {
+            alert('發送訊息失敗：' + (err.message || err));
+            console.error(err);
           });
       });
     });
