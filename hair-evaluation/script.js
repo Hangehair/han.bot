@@ -1,52 +1,60 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // 初始化 LIFF
   liff.init({ liffId: "2007657502-N6Xb70bg" })
-    .then(() => {
-      console.log("LIFF initialized");
-    })
-    .catch((err) => {
+    .then(() => console.log("LIFF initialized"))
+    .catch(err => {
       console.error("LIFF 初始化失敗：", err);
       alert("LIFF 初始化失敗，請稍後再試！");
     });
 
-  // 表單處理邏輯
   const form = document.getElementById('quiz-form');
 
-  form.addEventListener('submit', function (event) {
-    event.preventDefault(); // 阻止表單的預設提交行為
+  // 條件顯示輸入欄位
+  const conditionalFields = ['q1', 'q2', 'q4'];
+  conditionalFields.forEach(name => {
+    const select = form.elements[name];
+    const input = form.elements[`${name}_other`];
+    const toggleInput = () => {
+      input.style.display = select.value === '其他' ? 'block' : 'none';
+    };
+    select.addEventListener('change', toggleInput);
+    toggleInput();
+  });
 
-    // 取得表單值的工具函式
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+
     const getFormValue = (name) => {
-      const selectedValue = form.elements[name].value;
-      const otherValue = form.elements[`${name}_other`] ? form.elements[`${name}_other`].value : '';
-      return selectedValue === "其他" ? otherValue : selectedValue;
+      const val = form.elements[name].value;
+      const other = form.elements[`${name}_other`] ? form.elements[`${name}_other`].value : '';
+      return val === "其他" ? other : val;
     };
 
-    // 收集表單資料
     const formData = {
       髮型困擾: getFormValue("q1"),
       接髮效果: getFormValue("q2"),
       接髮經驗: getFormValue("q3"),
       想接髮原因: getFormValue("q4"),
       染燙習慣: getFormValue("q5"),
-      想接髮時間: getFormValue("q6")
+      想接髮時間: getFormValue("q6"),
+      預算範圍: form.elements["q7"].value,
+      髮質狀況: form.elements["q8"].value
     };
 
-    // 推薦邏輯
-    const determineRecommendation = (data) => {
-      if (data["染燙習慣"] === "不會染燙" && data["接髮效果"] === "加厚") {
-        return "羽毛鑽石髮";
-      } else if (data["染燙習慣"] === "會，定期染燙") {
-        return "羽毛處女髮";
-      } else if (data["接髮經驗"] === "沒有") {
-        return "羽毛仙女髮";
+    const determineRecommendation = (budget) => {
+      switch (budget) {
+        case "12000":
+          return { name: "天羽款式｜鑽石髮質", note: "適合不染燙者，輕柔順滑，髮質超自然" };
+        case "15000":
+          return { name: "天羽款式｜處女髮質", note: "可低頻染燙，保留原生光澤，手感佳" };
+        case "18000":
+          return { name: "天羽款式｜仙女髮質", note: "高端精品，絲滑飄逸，耐久使用" };
+        default:
+          return { name: "韓哥評估後推薦", note: "我們將由韓哥提供專業評估回覆" };
       }
-      return "羽毛處女髮"; // 預設推薦
     };
 
-    const recommendation = determineRecommendation(formData);
+    const recommendation = determineRecommendation(formData["預算範圍"]);
 
-    // 建立 Flex Message
     const flexMessage = {
       type: "flex",
       altText: "你的接髮推薦方案已送出！",
@@ -59,34 +67,62 @@ document.addEventListener('DOMContentLoaded', () => {
           contents: [
             {
               type: "text",
-              text: "接髮評估結果",
+              text: "🎀 接髮推薦結果",
               weight: "bold",
               size: "lg",
               color: "#c84d64"
             },
             {
               type: "text",
-              text: `推薦髮質：${recommendation}`,
+              text: `💡 推薦款式：${recommendation.name}`,
               wrap: true,
-              color: "#111111"
+              size: "md"
             },
             {
               type: "text",
-              text: "你的填寫內容：",
+              text: `📘 說明：${recommendation.note}`,
+              wrap: true,
+              size: "sm",
+              color: "#888888"
+            },
+            {
+              type: "separator",
+              margin: "md"
+            },
+            {
+              type: "text",
+              text: "📝 你提供的資訊：",
               weight: "bold",
               margin: "md"
             },
             ...Object.entries(formData).map(([key, value]) => ({
               type: "text",
               text: `${key}：${value}`,
-              wrap: true
+              wrap: true,
+              size: "sm"
             }))
+          ]
+        },
+        footer: {
+          type: "box",
+          layout: "vertical",
+          spacing: "sm",
+          contents: [
+            {
+              type: "button",
+              action: {
+                type: "message",
+                label: "查看款式價位",
+                text: "接髮價位"
+              },
+              style: "primary",
+              color: "#ff7c9e"
+            }
           ]
         }
       }
     };
 
-    // 傳送 Flex Message
     liff.sendMessages([flexMessage])
       .then(() => {
         alert("已成功傳送結果至聊天室！");
