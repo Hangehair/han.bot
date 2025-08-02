@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>接髮評估小幫手</title>
   <style>
     body {
@@ -68,8 +68,9 @@
           <option value="斷層不自然">斷層不自然</option>
           <option value="其他">其他（請自述）</option>
         </select>
-        <input type="text" name="q1_other" placeholder="請填寫">
+        <input type="text" name="q1_other" placeholder="請填寫" />
       </div>
+
       <div class="question">
         <label>2️⃣ 想要達成的效果？</label>
         <select name="q2">
@@ -78,8 +79,9 @@
           <option value="特殊造型">特殊造型</option>
           <option value="其他">其他（請自述）</option>
         </select>
-        <input type="text" name="q2_other" placeholder="請填寫">
+        <input type="text" name="q2_other" placeholder="請填寫" />
       </div>
+
       <div class="question">
         <label>3️⃣ 是否有接髮經驗？</label>
         <select name="q3">
@@ -88,6 +90,7 @@
           <option value="有，覺得效果還不錯">有，覺得效果還不錯</option>
         </select>
       </div>
+
       <div class="question">
         <label>4️⃣ 為什麼這次想接髮？</label>
         <select name="q4">
@@ -96,8 +99,9 @@
           <option value="長期接髮族">長期接髮族</option>
           <option value="其他">其他（請自述）</option>
         </select>
-        <input type="text" name="q4_other" placeholder="請填寫">
+        <input type="text" name="q4_other" placeholder="請填寫" />
       </div>
+
       <div class="question">
         <label>5️⃣ 平常會染燙嗎？</label>
         <select name="q5">
@@ -106,6 +110,7 @@
           <option value="不會染燙">不會染燙</option>
         </select>
       </div>
+
       <div class="question">
         <label>6️⃣ 最快想接髮的時間？</label>
         <select name="q6">
@@ -115,6 +120,7 @@
           <option value="我還在評估">我還在評估</option>
         </select>
       </div>
+
       <div class="question">
         <label>7️⃣ 預算範圍？</label>
         <select name="budget">
@@ -124,6 +130,7 @@
           <option value="推薦合適款式">推薦合適款式</option>
         </select>
       </div>
+
       <div class="question">
         <label>8️⃣ 髮質狀況？</label>
         <select name="hairQuality">
@@ -132,6 +139,7 @@
           <option value="頭髮粗細適中（髮量適中）">頭髮粗細適中（髮量適中）</option>
         </select>
       </div>
+
       <button type="submit">✨ 送出並查看推薦方案 ✨</button>
     </form>
   </div>
@@ -139,59 +147,71 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      liff.init({ liffId: "2007657502-N6Xb70bg" })
-        .then(() => console.log("LIFF 初始化成功"))
-        .catch((err) => {
-          console.error("LIFF 初始化失敗：", err);
-          alert("LIFF 初始化失敗，請稍後再試！");
-        });
+      liff.init({ liffId: "2007657502-N6Xb70bg" }).catch(console.error);
 
       const form = document.getElementById('quiz-form');
-
-      ['q1', 'q2', 'q4'].forEach(name => {
-        const select = form.elements[name];
-        const input = form.elements[`${name}_other`];
-        const toggle = () => input.style.display = select.value === '其他' ? 'block' : 'none';
-        select.addEventListener('change', toggle);
-        toggle();
+      ['q1','q2','q4'].forEach(name => {
+        const sel = form.elements[name], inp = form.elements[`${name}_other`];
+        const show = () => inp.style.display = sel.value === "其他" ? "block" : "none";
+        sel.addEventListener("change", show); show();
       });
 
-      form.addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        const getFormValue = (name) => {
-          const selectedValue = form.elements[name].value;
-          const otherValue = form.elements[`${name}_other`] ? form.elements[`${name}_other`].value : '';
-          return selectedValue === "其他" ? otherValue : selectedValue;
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const getValue = name => {
+          const v = form.elements[name].value;
+          const o = form.elements[`${name}_other`] ? form.elements[`${name}_other`].value : "";
+          return v === "其他" ? o : v;
         };
 
-        const formData = {
-          髮型困擾: getFormValue("q1"),
-          接髮效果: getFormValue("q2"),
-          接髮經驗: getFormValue("q3"),
-          想接髮原因: getFormValue("q4"),
-          染燙習慣: getFormValue("q5"),
-          想接髮時間: getFormValue("q6"),
+        const data = {
+          髮型困擾: getValue("q1"),
+          接髮效果: getValue("q2"),
+          接髮經驗: getValue("q3"),
+          想接髮原因: getValue("q4"),
+          染燙習慣: getValue("q5"),
+          想接髮時間: getValue("q6"),
           預算範圍: form.elements["budget"].value,
           髮質狀況: form.elements["hairQuality"].value
         };
 
-        const formText = Object.entries(formData)
-          .map(([key, val]) => `${key}：${val}`)
-          .join('\n');
+        const flexBubble = {
+          type: "flex",
+          altText: "接髮評估結果",
+          contents: {
+            type: "bubble",
+            body: {
+              type: "box",
+              layout: "vertical",
+              spacing: "md",
+              paddingAll: "20px",
+              backgroundColor: "#fff8f9",
+              contents: [
+                { type: "text", text: "接髮評估結果", weight: "bold", size: "xl", color: "#c84d64" },
+                { type: "separator", margin: "md" },
+                ...Object.entries(data).map(([k,v]) => ({
+                  type: "box", layout: "horizontal", contents: [
+                    { type: "text", text: k, size: "sm", flex: 3, color: "#666" },
+                    { type: "text", text: v, size: "sm", flex: 5, color: "#111", wrap: true }
+                  ]
+                }))
+              ]
+            },
+            styles: { body: { backgroundColor: "#fff8f9" } }
+          }
+        };
 
-        liff.sendMessages([
-          { type: "text", text: `✨ 接髮評估內容如下：\n${formText}` },
-          { type: "text", text: "接髮價位" } // 自動發送關鍵字
-        ])
-        .then(() => {
+        try {
+          await liff.sendMessages([
+            { type: "text", text: "接髮價位" },
+            flexBubble
+          ]);
           alert("✅ 已成功發送！");
           liff.closeWindow();
-        })
-        .catch((err) => {
-          console.error("❌ 傳送失敗：", err);
-          alert("❌ 傳送失敗，請稍後再試！");
-        });
+        } catch (err) {
+          console.error(err);
+          alert("❌ 傳送失敗，請在 LINE App 中開啟重試");
+        }
       });
     });
   </script>
