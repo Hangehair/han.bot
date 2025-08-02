@@ -12,8 +12,8 @@
     label { font-weight:600; color:#2d3748; font-size:15px; }
     input, select, button { padding:12px; border:1px solid #e2e8f0; border-radius:8px; font-size:15px; transition:all .3s ease; }
     input:focus, select:focus { border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.1); }
-    button { background:#007bff; color: white; font-weight:600; cursor:pointer; border:none; }
-    button:hover { background:#0056b3; }
+    button { background:#fff; color:#007bff; font-weight:600; cursor:pointer; border:2px solid #007bff; }
+    button:hover { background:#e3f2fd; }
     .multi-select { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
     .multi-select button { padding:12px; border:1px solid #007bff; background:#fff; color:#007bff; border-radius:8px; transition:all .2s; }
     .multi-select button.selected { background:#007bff; color:#fff; }
@@ -93,10 +93,7 @@
         .then(() => liff.getProfile().then(p => {
           document.getElementById('name').value = p.displayName;
         }))
-        .catch(err => {
-          console.error('LIFF 初始化失敗：', err);
-          alert('LINE 資料無法取得，請手動填寫姓名！');
-        });
+        .catch(console.error);
 
       document.getElementById('bookingForm').addEventListener('submit', e => {
         e.preventDefault();
@@ -107,7 +104,66 @@
         const services = Array.from(sel).join(', ');
         if (!services) return alert('請選擇至少一項服務！');
 
-        alert(`預約成功！\n姓名：${name}\n電話：${phone}\n日期：${date}\n時間：${time}\n項目：${services}`);
+        // .ics 日曆連結
+        const title = encodeURIComponent(`預約：${name} - ${services}`);
+        const desc  = encodeURIComponent(`預約服務：${services}\n電話：${phone}\n姓名：${name}`);
+        const loc   = encodeURIComponent('台北市萬華區西門町');
+        const ics   = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}:00&description=${desc}&location=${loc}`;
+
+        const flexMessage = {
+          type: 'flex',
+          altText: '預約成功通知',
+          contents: {
+            type: 'bubble',
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                { type: 'text', text: '🎉 預約成功！', weight: 'bold', size: 'lg', align: 'center' },
+                { type: 'text', text: `${date} ${time}`, align: 'center', margin: 'md' },
+                { type: 'separator', margin: 'md' },
+                { type: 'text', text: `姓名：${name}`, margin: 'md' },
+                { type: 'text', text: `電話：${phone}`, margin: 'sm' },
+                { type: 'text', text: `項目：${services}`, wrap: true, margin: 'sm' }
+              ]
+            },
+            footer: {
+              type: 'box',
+              layout: 'vertical',
+              spacing: 'sm',
+              contents: [
+                {
+                  type: 'button',
+                  style: 'primary',
+                  action: {
+                    type: 'uri',
+                    label: '加入手機日曆',
+                    uri: ics
+                  }
+                },
+                {
+                  type: 'button',
+                  style: 'secondary',
+                  action: {
+                    type: 'uri',
+                    label: '查看韓哥髮廊地址',
+                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
+                  }
+                }
+              ]
+            }
+          }
+        };
+
+        liff.sendMessages([flexMessage])
+          .then(() => {
+            alert('預約成功！我們已收到您的資料，韓哥將親自與您確認！');
+            liff.closeWindow();
+          })
+          .catch(err => {
+            alert('發送訊息失敗：' + (err.message || err));
+            console.error(err);
+          });
       });
     });
   </script>
