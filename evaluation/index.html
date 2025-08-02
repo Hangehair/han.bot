@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>接髮評估小幫手</title>
   <style>
     body {
@@ -11,7 +11,6 @@
       padding: 20px;
       color: #333;
     }
-
     .container {
       max-width: 600px;
       margin: 0 auto;
@@ -20,25 +19,21 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       padding: 24px;
     }
-
     h1 {
       font-size: 24px;
       color: #c84d64;
       text-align: center;
       margin-bottom: 20px;
     }
-
     .question {
       margin-bottom: 20px;
     }
-
     label {
       display: block;
       font-weight: bold;
       margin-bottom: 6px;
       color: #444;
     }
-
     select, input[type="text"] {
       width: 100%;
       padding: 8px;
@@ -46,7 +41,6 @@
       border-radius: 6px;
       margin-top: 4px;
     }
-
     button {
       width: 100%;
       padding: 12px;
@@ -57,7 +51,6 @@
       border-radius: 6px;
       cursor: pointer;
     }
-
     button:hover {
       background: #e96a8c;
     }
@@ -77,7 +70,6 @@
         </select>
         <input type="text" name="q1_other" placeholder="請填寫">
       </div>
-
       <div class="question">
         <label>2️⃣ 想要達成的效果？</label>
         <select name="q2">
@@ -88,7 +80,6 @@
         </select>
         <input type="text" name="q2_other" placeholder="請填寫">
       </div>
-
       <div class="question">
         <label>3️⃣ 是否有接髮經驗？</label>
         <select name="q3">
@@ -97,7 +88,6 @@
           <option value="有，覺得效果還不錯">有，覺得效果還不錯</option>
         </select>
       </div>
-
       <div class="question">
         <label>4️⃣ 為什麼這次想接髮？</label>
         <select name="q4">
@@ -108,7 +98,6 @@
         </select>
         <input type="text" name="q4_other" placeholder="請填寫">
       </div>
-
       <div class="question">
         <label>5️⃣ 平常會染燙嗎？</label>
         <select name="q5">
@@ -117,7 +106,6 @@
           <option value="不會染燙">不會染燙</option>
         </select>
       </div>
-
       <div class="question">
         <label>6️⃣ 最快想接髮的時間？</label>
         <select name="q6">
@@ -127,7 +115,6 @@
           <option value="我還在評估">我還在評估</option>
         </select>
       </div>
-
       <div class="question">
         <label>7️⃣ 預算範圍？</label>
         <select name="budget">
@@ -137,7 +124,6 @@
           <option value="推薦合適款式">推薦合適款式</option>
         </select>
       </div>
-
       <div class="question">
         <label>8️⃣ 髮質狀況？</label>
         <select name="hairQuality">
@@ -146,7 +132,6 @@
           <option value="頭髮粗細適中（髮量適中）">頭髮粗細適中（髮量適中）</option>
         </select>
       </div>
-
       <button type="submit">✨ 送出並查看推薦方案 ✨</button>
     </form>
   </div>
@@ -154,11 +139,8 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 初始化 LIFF
       liff.init({ liffId: "2007657502-N6Xb70bg" })
-        .then(() => {
-          console.log("LIFF initialized");
-        })
+        .then(() => console.log("LIFF 初始化成功"))
         .catch((err) => {
           console.error("LIFF 初始化失敗：", err);
           alert("LIFF 初始化失敗，請稍後再試！");
@@ -166,7 +148,6 @@
 
       const form = document.getElementById('quiz-form');
 
-      // 條件顯示「其他」欄位
       ['q1', 'q2', 'q4'].forEach(name => {
         const select = form.elements[name];
         const input = form.elements[`${name}_other`];
@@ -184,7 +165,6 @@
           return selectedValue === "其他" ? otherValue : selectedValue;
         };
 
-        // 收集表單資料
         const formData = {
           髮型困擾: getFormValue("q1"),
           接髮效果: getFormValue("q2"),
@@ -196,48 +176,22 @@
           髮質狀況: form.elements["hairQuality"].value
         };
 
-        const flexMessage = {
-          type: "flex",
-          altText: "你的接髮評估已送出！",
-          contents: {
-            type: "bubble",
-            body: {
-              type: "box",
-              layout: "vertical",
-              spacing: "md",
-              contents: [
-                {
-                  type: "text",
-                  text: "✨ 接髮評估結果",
-                  weight: "bold",
-                  size: "lg",
-                  color: "#c84d64"
-                },
-                {
-                  type: "text",
-                  text: "📝 你填寫的內容：",
-                  weight: "bold",
-                  margin: "md"
-                },
-                ...Object.entries(formData).map(([key, value]) => ({
-                  type: "text",
-                  text: `${key}：${value}`,
-                  wrap: true
-                }))
-              ]
-            }
-          }
-        };
+        const formText = Object.entries(formData)
+          .map(([key, val]) => `${key}：${val}`)
+          .join('\n');
 
-        liff.sendMessages([flexMessage])
-          .then(() => {
-            alert("已成功傳送至聊天室！");
-            liff.closeWindow();
-          })
-          .catch((err) => {
-            console.error("傳送訊息失敗：", err);
-            alert("傳送訊息失敗，請稍後再試！");
-          });
+        liff.sendMessages([
+          { type: "text", text: `✨ 接髮評估內容如下：\n${formText}` },
+          { type: "text", text: "接髮價位" } // 自動發送關鍵字
+        ])
+        .then(() => {
+          alert("✅ 已成功發送！");
+          liff.closeWindow();
+        })
+        .catch((err) => {
+          console.error("❌ 傳送失敗：", err);
+          alert("❌ 傳送失敗，請稍後再試！");
+        });
       });
     });
   </script>
