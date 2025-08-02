@@ -176,13 +176,17 @@
           髮質狀況: form.elements["hairQuality"].value
         };
 
+        const summary = Object.entries(data)
+          .map(([k, v]) => `${k}：${v}`)
+          .join('\n');
+
         const bubble = {
           type: "bubble",
           size: "mega",
           body: {
             type: "box",
             layout: "vertical",
-            spacing: "sm",
+            spacing: "md",
             paddingAll: "20px",
             backgroundColor: "#fff8f9",
             contents: [
@@ -199,33 +203,11 @@
               },
               {
                 type: "text",
-                text: "你的填寫內容：",
-                weight: "bold",
-                size: "md",
-                margin: "md"
-              },
-              ...Object.entries(data).map(([label, value]) => ({
-                type: "box",
-                layout: "horizontal",
-                margin: "sm",
-                contents: [
-                  {
-                    type: "text",
-                    text: `${label}：`,
-                    size: "sm",
-                    color: "#555",
-                    flex: 4
-                  },
-                  {
-                    type: "text",
-                    text: value,
-                    size: "sm",
-                    color: "#111",
-                    flex: 6,
-                    wrap: true
-                  }
-                ]
-              }))
+                text: summary,
+                size: "sm",
+                wrap: true,
+                color: "#333"
+              }
             ]
           }
         };
