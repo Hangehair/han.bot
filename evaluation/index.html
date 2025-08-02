@@ -166,7 +166,7 @@
 
       const form = document.getElementById('quiz-form');
 
-      // 條件顯示輸入欄位
+      // 條件顯示「其他」欄位
       ['q1', 'q2', 'q4'].forEach(name => {
         const select = form.elements[name];
         const input = form.elements[`${name}_other`];
@@ -184,6 +184,7 @@
           return selectedValue === "其他" ? otherValue : selectedValue;
         };
 
+        // 收集表單資料
         const formData = {
           髮型困擾: getFormValue("q1"),
           接髮效果: getFormValue("q2"),
@@ -195,24 +196,9 @@
           髮質狀況: form.elements["hairQuality"].value
         };
 
-        const determineHairRecommendation = (budget) => {
-          switch (budget) {
-            case "12000":
-              return { name: "天羽款式｜鑽石髮質", desc: "💎 鑽石髮質：亮澤柔順，適合新手體驗接髮" };
-            case "15000":
-              return { name: "天羽款式｜處女髮質", desc: "🌸 處女髮質：自然未加工，可染燙修剪" };
-            case "18000":
-              return { name: "天羽款式｜仙女髮質", desc: "✨ 仙女髮質：頂級絲滑髮源，超高維持度" };
-            default:
-              return { name: "韓哥評估後推薦", desc: "🔍 根據您的髮況與需求提供最適接髮方案" };
-          }
-        };
-
-        const { name, desc } = determineHairRecommendation(formData["預算範圍"]);
-
         const flexMessage = {
           type: "flex",
-          altText: "你的接髮推薦方案已送出！",
+          altText: "你的接髮評估已送出！",
           contents: {
             type: "bubble",
             body: {
@@ -220,10 +206,19 @@
               layout: "vertical",
               spacing: "md",
               contents: [
-                { type: "text", text: "接髮評估結果", weight: "bold", size: "lg", color: "#c84d64" },
-                { type: "text", text: `推薦髮質：${name}`, wrap: true, color: "#111111" },
-                { type: "text", text: desc, wrap: true, size: "sm", color: "#666" },
-                { type: "text", text: "你的填寫內容：", weight: "bold", margin: "md" },
+                {
+                  type: "text",
+                  text: "✨ 接髮評估結果",
+                  weight: "bold",
+                  size: "lg",
+                  color: "#c84d64"
+                },
+                {
+                  type: "text",
+                  text: "📝 你填寫的內容：",
+                  weight: "bold",
+                  margin: "md"
+                },
                 ...Object.entries(formData).map(([key, value]) => ({
                   type: "text",
                   text: `${key}：${value}`,
@@ -236,7 +231,7 @@
 
         liff.sendMessages([flexMessage])
           .then(() => {
-            alert("已成功傳送結果至聊天室！");
+            alert("已成功傳送至聊天室！");
             liff.closeWindow();
           })
           .catch((err) => {
