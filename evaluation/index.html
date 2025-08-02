@@ -124,9 +124,9 @@
       <div class="question">
         <label>7️⃣ 預算範圍？</label>
         <select name="budget">
-          <option value="12000">12000 元</option>
-          <option value="15000">15000 元</option>
-          <option value="18000">18000 元</option>
+          <option value="12000">12000</option>
+          <option value="15000">15000</option>
+          <option value="18000">18000</option>
           <option value="推薦合適款式">推薦合適款式</option>
         </select>
       </div>
@@ -176,40 +176,63 @@
           髮質狀況: form.elements["hairQuality"].value
         };
 
-        const contents = [
-          { type: "text", text: "接髮評估結果", weight: "bold", size: "lg", color: "#c84d64" },
-          { type: "text", text: "你的填寫內容：", weight: "bold", margin: "md" },
-          ...Object.entries(data).map(([k, v]) => ({
-            type: "text", text: `${k}：${v}`, size: "sm", wrap: true, color: "#333"
-          }))
-        ];
-
-        const flex = {
-          type: "flex",
-          altText: "接髮評估結果",
-          contents: {
-            type: "bubble",
-            size: "mega",
-            body: {
-              type: "box",
-              layout: "vertical",
-              spacing: "sm",
-              paddingAll: "20px",
-              backgroundColor: "#ffffff",
-              contents
-            },
-            styles: {
-              body: {
-                backgroundColor: "#fff8f9"
-              }
-            }
+        const bubble = {
+          type: "bubble",
+          size: "mega",
+          body: {
+            type: "box",
+            layout: "vertical",
+            spacing: "sm",
+            paddingAll: "20px",
+            backgroundColor: "#fff8f9",
+            contents: [
+              {
+                type: "text",
+                text: "接髮評估結果",
+                weight: "bold",
+                size: "xl",
+                color: "#c84d64"
+              },
+              {
+                type: "separator",
+                margin: "md"
+              },
+              {
+                type: "text",
+                text: "你的填寫內容：",
+                weight: "bold",
+                size: "md",
+                margin: "md"
+              },
+              ...Object.entries(data).map(([label, value]) => ({
+                type: "box",
+                layout: "horizontal",
+                margin: "sm",
+                contents: [
+                  {
+                    type: "text",
+                    text: `${label}：`,
+                    size: "sm",
+                    color: "#555",
+                    flex: 4
+                  },
+                  {
+                    type: "text",
+                    text: value,
+                    size: "sm",
+                    color: "#111",
+                    flex: 6,
+                    wrap: true
+                  }
+                ]
+              }))
+            ]
           }
         };
 
         try {
           await liff.sendMessages([
-            { type: "text", text: "接髮價位" },
-            flex
+            { type: "flex", altText: "接髮評估結果", contents: bubble }
           ]);
           alert("✅ 已成功發送！");
           liff.closeWindow();
