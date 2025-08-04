@@ -56,6 +56,7 @@
       font-size: 16px;
       border-radius: 6px;
       cursor: pointer;
+      margin-top: 10px;
     }
 
     button:hover {
@@ -148,6 +149,8 @@
       </div>
 
       <button type="submit">✨ 送出資料 ✨</button>
+      <button type="button" id="btn-introduction">📖 接點介紹</button>
+      <button type="button" id="btn-pricing">💰 接髮價位</button>
     </form>
   </div>
 
@@ -223,6 +226,30 @@
           .then(() => {
             alert("已成功傳送資料至聊天室！");
             liff.closeWindow();
+          })
+          .catch((err) => {
+            console.error("傳送訊息失敗：", err);
+            alert("傳送訊息失敗，請稍後再試！");
+          });
+      });
+
+      // 按鈕：接點介紹
+      document.getElementById('btn-introduction').addEventListener('click', () => {
+        liff.sendMessages([{ type: 'text', text: '接點介紹' }])
+          .then(() => {
+            alert('已傳送「接點介紹」至聊天室！');
+          })
+          .catch((err) => {
+            console.error("傳送訊息失敗：", err);
+            alert("傳送訊息失敗，請稍後再試！");
+          });
+      });
+
+      // 按鈕：接髮價位
+      document.getElementById('btn-pricing').addEventListener('click', () => {
+        liff.sendMessages([{ type: 'text', text: '接髮價位' }])
+          .then(() => {
+            alert('已傳送「接髮價位」至聊天室！');
           })
           .catch((err) => {
             console.error("傳送訊息失敗：", err);
