@@ -45,6 +45,11 @@
       border: 1px solid #ddd;
       border-radius: 6px;
       margin-top: 4px;
+      font-size: 14px;
+    }
+
+    input[type="text"] {
+      display: none;
     }
 
     button {
@@ -62,66 +67,150 @@
     button:hover {
       background: #e96a8c;
     }
+
+    .info-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .info-btn {
+      flex: 1;
+      padding: 10px;
+      background: #f0f0f0;
+      border: 1px solid #ddd;
+      color: #333;
+      font-size: 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .info-btn:hover {
+      background: #e0e0e0;
+    }
+
+    option[disabled] {
+      background-color: #f0f0f0;
+      color: #666;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>✨ 接髮方案評估 ✨</h1>
+    
+    <!-- 快速查詢按鈕 -->
+    <div class="info-buttons">
+      <button class="info-btn" id="btn-introduction">📖 接點介紹</button>
+      <button class="info-btn" id="btn-pricing">💰 接髮價位</button>
+    </div>
+
     <form id="quiz-form">
+      
+      <!-- 問題1 -->
       <div class="question">
         <label>1️⃣ 現在的髮型困擾是？</label>
-        <select name="q1">
+        <select name="q1" required>
+          <option value="">請選擇...</option>
           <option value="髮量少">髮量少</option>
           <option value="長度不夠">長度不夠</option>
           <option value="斷層不自然">斷層不自然</option>
           <option value="其他">其他（請自述）</option>
         </select>
-        <input type="text" name="q1_other" placeholder="請填寫">
+        <input type="text" name="q1_other" placeholder="請填寫其他困擾">
       </div>
 
+      <!-- 問題2 -->
       <div class="question">
         <label>2️⃣ 想要達成的效果？</label>
-        <select name="q2">
+        <select name="q2" required>
+          <option value="">請選擇...</option>
           <option value="加厚">加厚</option>
           <option value="加長">加長</option>
           <option value="特殊造型">特殊造型</option>
           <option value="其他">其他（請自述）</option>
         </select>
-        <input type="text" name="q2_other" placeholder="請填寫">
+        <input type="text" name="q2_other" placeholder="請填寫想要的效果">
       </div>
 
+      <!-- 問題3 -->
       <div class="question">
-        <label>3️⃣ 是否有接髮經驗？</label>
-        <select name="q3">
+        <label>3️⃣ 希望接髮維持多久？</label>
+        <select name="q3" required>
+          <option value="">請選擇...</option>
+          <option value="4-6個月">4-6個月（標準接髮週期）</option>
+          <option value="6-10個月">6-10個月（長效接髮）</option>
+          <option value="12個月以上">12個月以上（長期接髮族）</option>
+          <option value="不確定">不確定，請韓哥推薦</option>
+        </select>
+      </div>
+
+      <!-- 問題4 -->
+      <div class="question">
+        <label>4️⃣ 理想的接髮長度？</label>
+        <select name="q4" required>
+          <option value="">請選擇...</option>
+          <option value="蓋胸附近">蓋胸附近</option>
+          <option value="胸下附近">胸下附近</option>
+          <option value="及腰附近">及腰附近</option>
+          <option value="不確定">不確定，請韓哥建議</option>
+        </select>
+      </div>
+
+      <!-- 問題5 -->
+      <div class="question">
+        <label>5️⃣ 是否有接髮經驗？</label>
+        <select name="q5" required>
+          <option value="">請選擇...</option>
           <option value="沒有">沒有</option>
           <option value="有，但經驗不佳">有，但經驗不佳</option>
           <option value="有，覺得效果還不錯">有，覺得效果還不錯</option>
         </select>
       </div>
 
+      <!-- 問題6 -->
       <div class="question">
-        <label>4️⃣ 為什麼這次想接髮？</label>
-        <select name="q4">
-          <option value="重要活動（婚禮/拍照等）">重要活動（婚禮/拍照等）</option>
-          <option value="單純想改變風格">單純想改變風格</option>
-          <option value="長期接髮族">長期接髮族</option>
-          <option value="其他">其他（請自述）</option>
-        </select>
-        <input type="text" name="q4_other" placeholder="請填寫">
-      </div>
-
-      <div class="question">
-        <label>5️⃣ 平常會染燙嗎？</label>
-        <select name="q5">
-          <option value="會，定期染燙">會，定期染燙</option>
-          <option value="偶爾染燙">偶爾染燙</option>
-          <option value="不會染燙">不會染燙</option>
+        <label>6️⃣ 你的真髮目前狀況？</label>
+        <select name="q6" required>
+          <option value="">請選擇...</option>
+          <option value="原生髮色（沒染過）">原生髮色（沒染過）</option>
+          <option value="染過深色">染過深色（咖啡/黑色系）</option>
+          <option value="染過淺色">染過淺色（棕/金色系）</option>
+          <option value="漂過頭髮">漂過頭髮</option>
         </select>
       </div>
 
+      <!-- 問題7 -->
       <div class="question">
-        <label>6️⃣ 最快想接髮的時間？</label>
-        <select name="q6">
+        <label>7️⃣ 接髮後想要的髮色？</label>
+        <select name="q7" required>
+          <option value="">請選擇...</option>
+          <option value="維持原色（不染）">維持原色（不染）</option>
+          <option value="深色系">深色系（黑/深咖啡）</option>
+          <option value="自然棕色系">自然棕色系（百搭款）</option>
+          <option value="淺色系">淺色系（奶茶/亞麻）</option>
+          <option value="特殊色">特殊色（霧灰/奶茶灰）</option>
+          <option value="不確定">不確定，請韓哥建議</option>
+        </select>
+      </div>
+
+      <!-- 問題8 -->
+      <div class="question">
+        <label>8️⃣ 髮質狀況？</label>
+        <select name="q8" required>
+          <option value="">請選擇...</option>
+          <option value="頭髮粗硬（髮量多）">頭髮粗硬（髮量多）</option>
+          <option value="頭髮細軟（髮量少）">頭髮細軟（髮量少）</option>
+          <option value="頭髮粗細適中（髮量適中）">頭髮粗細適中（髮量適中）</option>
+        </select>
+      </div>
+
+      <!-- 問題9 -->
+      <div class="question">
+        <label>9️⃣ 最快想接髮的時間？</label>
+        <select name="q9" required>
+          <option value="">請選擇...</option>
           <option value="1個禮拜內">1個禮拜內</option>
           <option value="這個月內">這個月內</option>
           <option value="下個月">下個月</option>
@@ -129,28 +218,21 @@
         </select>
       </div>
 
+      <!-- 問題10 -->
       <div class="question">
-        <label>7️⃣ 預算範圍？</label>
-        <select name="budget">
-          <option value="12000">12000 元</option>
-          <option value="15000">15000 元</option>
-          <option value="18000">18000 元</option>
-          <option value="推薦合適款式">推薦合適款式</option>
-        </select>
-      </div>
-
-      <div class="question">
-        <label>8️⃣ 髮質狀況？</label>
-        <select name="hairQuality">
-          <option value="頭髮粗硬（髮量多）">頭髮粗硬（髮量多）</option>
-          <option value="頭髮細軟（髮量少）">頭髮細軟（髮量少）</option>
-          <option value="頭髮粗細適中（髮量適中）">頭髮粗細適中（髮量適中）</option>
+        <label>🔟 預算範圍？（依據髮質等級）</label>
+        <select name="budget" required>
+          <option value="" disabled selected>📌 以下價位為約蓋胸長度參考</option>
+          <option value="4999">💫 $4,999起 - 基礎款（50克髮量）</option>
+          <option value="8999">✨ $8,999起 - 標準款（100克髮量）</option>
+          <option value="12000">💎 $12,000起 - 鑽石髮（150克｜適合不染髮）</option>
+          <option value="15000">👑 $15,000起 - 處女髮（150克｜可染淺色）</option>
+          <option value="18000">🌟 $18,000起 - 仙女髮（150克｜頂級髮質）</option>
+          <option value="推薦">🤝 請韓哥依需求推薦最適方案</option>
         </select>
       </div>
 
       <button type="submit">✨ 送出資料 ✨</button>
-      <button type="button" id="btn-introduction">📖 接點介紹</button>
-      <button type="button" id="btn-pricing">💰 接髮價位</button>
     </form>
   </div>
 
@@ -169,71 +251,7 @@
 
       const form = document.getElementById('quiz-form');
 
-      // 條件顯示輸入欄位
-      ['q1', 'q2', 'q4'].forEach(name => {
-        const select = form.elements[name];
-        const input = form.elements[`${name}_other`];
-        const toggle = () => input.style.display = select.value === '其他' ? 'block' : 'none';
-        select.addEventListener('change', toggle);
-        toggle();
-      });
-
-      form.addEventListener('submit', function (event) {
-        event.preventDefault();
-
-        const getFormValue = (name) => {
-          const selectedValue = form.elements[name].value;
-          const otherValue = form.elements[`${name}_other`] ? form.elements[`${name}_other`].value : '';
-          return selectedValue === "其他" ? otherValue : selectedValue;
-        };
-
-        const formData = {
-          髮型困擾: getFormValue("q1"),
-          接髮效果: getFormValue("q2"),
-          接髮經驗: getFormValue("q3"),
-          想接髮原因: getFormValue("q4"),
-          染燙習慣: getFormValue("q5"),
-          想接髮時間: getFormValue("q6"),
-          預算範圍: form.elements["budget"].value,
-          髮質狀況: form.elements["hairQuality"].value
-        };
-
-        const flexMessage = {
-          type: "flex",
-          altText: "你的接髮評估資料已送出！",
-          contents: {
-            type: "bubble",
-            body: {
-              type: "box",
-              layout: "vertical",
-              spacing: "md",
-              contents: [
-                { type: "text", text: "接髮評估資料", weight: "bold", size: "lg", color: "#c84d64" },
-                ...Object.entries(formData).map(([key, value]) => ({
-                  type: "box",
-                  layout: "horizontal",
-                  contents: [
-                    { type: "text", text: `${key}`, size: "sm", color: "#111111", flex: 2 },
-                    { type: "text", text: `${value}`, size: "sm", color: "#666666", flex: 3, wrap: true }
-                  ]
-                }))
-              ]
-            }
-          }
-        };
-
-        liff.sendMessages([flexMessage])
-          .then(() => {
-            alert("已成功傳送資料至聊天室！");
-            liff.closeWindow();
-          })
-          .catch((err) => {
-            console.error("傳送訊息失敗：", err);
-            alert("傳送訊息失敗，請稍後再試！");
-          });
-      });
-
-      // 按鈕：接點介紹
+      // 快速查詢按鈕：接點介紹
       document.getElementById('btn-introduction').addEventListener('click', () => {
         liff.sendMessages([{ type: 'text', text: '接點介紹' }])
           .then(() => {
@@ -245,7 +263,7 @@
           });
       });
 
-      // 按鈕：接髮價位
+      // 快速查詢按鈕：接髮價位
       document.getElementById('btn-pricing').addEventListener('click', () => {
         liff.sendMessages([{ type: 'text', text: '接髮價位' }])
           .then(() => {
@@ -254,6 +272,101 @@
           .catch((err) => {
             console.error("傳送訊息失敗：", err);
             alert("傳送訊息失敗，請稍後再試！");
+          });
+      });
+
+      // 條件顯示輸入欄位（其他選項）
+      ['q1', 'q2'].forEach(name => {
+        const select = form.elements[name];
+        const input = form.elements[`${name}_other`];
+        const toggle = () => input.style.display = select.value === '其他' ? 'block' : 'none';
+        select.addEventListener('change', toggle);
+        toggle();
+      });
+
+      // 表單提交
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const getFormValue = (name) => {
+          const selectedValue = form.elements[name].value;
+          const otherValue = form.elements[`${name}_other`] ? form.elements[`${name}_other`].value : '';
+          return selectedValue === "其他" ? otherValue : selectedValue;
+        };
+
+        const formData = {
+          髮型困擾: getFormValue("q1"),
+          期望效果: getFormValue("q2"),
+          維持時間: form.elements["q3"].value,
+          理想長度: form.elements["q4"].value,
+          接髮經驗: form.elements["q5"].value,
+          真髮狀況: form.elements["q6"].value,
+          目標髮色: form.elements["q7"].value,
+          髮質狀況: form.elements["q8"].value,
+          想接髮時間: form.elements["q9"].value,
+          預算範圍: form.elements["budget"].value
+        };
+
+        // 建立 Flex Message（LINE 通知風格）
+        const flexMessage = {
+          type: "flex",
+          altText: "接髮評估資料已送出！",
+          contents: {
+            type: "bubble",
+            body: {
+              type: "box",
+              layout: "vertical",
+              spacing: "md",
+              contents: [
+                {
+                  type: "text",
+                  text: "接髮評估資料",
+                  weight: "bold",
+                  size: "lg",
+                  color: "#111111",
+                  margin: "none"
+                },
+                {
+                  type: "separator",
+                  margin: "md"
+                },
+                ...Object.entries(formData).map(([key, value]) => ({
+                  type: "box",
+                  layout: "horizontal",
+                  spacing: "sm",
+                  margin: "lg",
+                  contents: [
+                    { 
+                      type: "text", 
+                      text: `${key}`, 
+                      size: "sm", 
+                      color: "#555555", 
+                      flex: 2
+                    },
+                    { 
+                      type: "text", 
+                      text: `${value}`, 
+                      size: "sm", 
+                      color: "#111111", 
+                      flex: 3, 
+                      wrap: true
+                    }
+                  ]
+                }))
+              ]
+            }
+          }
+        };
+
+        // 發送訊息
+        liff.sendMessages([flexMessage])
+          .then(() => {
+            alert("✅ 已成功傳送資料至聊天室！");
+            liff.closeWindow();
+          })
+          .catch((err) => {
+            console.error("傳送訊息失敗：", err);
+            alert("❌ 傳送訊息失敗，請稍後再試！");
           });
       });
     });
