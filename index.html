@@ -14,6 +14,7 @@
     input:focus, select:focus { border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.1); }
     button { background:#fff; color:#007bff; font-weight:600; cursor:pointer; border:2px solid #007bff; }
     button:hover { background:#e3f2fd; }
+    button:disabled { opacity:0.6; cursor:not-allowed; }
     .multi-select { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
     .multi-select button { padding:12px; border:1px solid #007bff; background:#fff; color:#007bff; border-radius:8px; transition:all .2s; }
     .multi-select button.selected { background:#007bff; color:#fff; }
@@ -104,66 +105,110 @@
         const services = Array.from(sel).join(', ');
         if (!services) return alert('請選擇至少一項服務！');
 
-        // .ics 日曆連結
-        const title = encodeURIComponent(`預約：${name} - ${services}`);
-        const desc  = encodeURIComponent(`預約服務：${services}\n電話：${phone}\n姓名：${name}`);
-        const loc   = encodeURIComponent('台北市萬華區西門町');
-        const ics   = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}:00&description=${desc}&location=${loc}`;
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = '預約中...';
+        submitBtn.disabled = true;
 
-        const flexMessage = {
-          type: 'flex',
-          altText: '預約成功通知',
-          contents: {
-            type: 'bubble',
-            body: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                { type: 'text', text: '🎉 預約成功！', weight: 'bold', size: 'lg', align: 'center' },
-                { type: 'text', text: `${date} ${time}`, align: 'center', margin: 'md' },
-                { type: 'separator', margin: 'md' },
-                { type: 'text', text: `姓名：${name}`, margin: 'md' },
-                { type: 'text', text: `電話：${phone}`, margin: 'sm' },
-                { type: 'text', text: `項目：${services}`, wrap: true, margin: 'sm' }
-              ]
-            },
-            footer: {
-              type: 'box',
-              layout: 'vertical',
-              spacing: 'sm',
-              contents: [
-                {
-                  type: 'button',
-                  style: 'primary',
-                  action: {
-                    type: 'uri',
-                    label: '加入手機日曆',
-                    uri: ics
-                  }
-                },
-                {
-                  type: 'button',
-                  style: 'secondary',
-                  action: {
-                    type: 'uri',
-                    label: '查看韓哥髮廊地址',
-                    uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
-                  }
-                }
-              ]
-            }
-          }
-        };
+        // 🆕 偵測系統並產生對應的日曆連結
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        let calendarUrl;
 
-        liff.sendMessages([flexMessage])
-          .then(() => {
-            alert('預約成功！我們已收到您的資料，韓哥將親自與您確認！');
-            liff.closeWindow();
+        if (isIOS) {
+          // iOS 使用 .ics
+          const title = encodeURIComponent(`預約：${name} - ${services}`);
+          const desc  = encodeURIComponent(`預約服務：${services}\n電話：${phone}\n姓名：${name}`);
+          const loc   = encodeURIComponent('台北市萬華區西門町');
+          calendarUrl = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}:00&description=${desc}&location=${loc}`;
+        } else {
+          // Android/其他使用 Google Calendar
+          const startDateTime = `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
+          const endTime = new Date(`${date}T${time}`);
+          endTime.setHours(endTime.getHours() + 2); // 預設 2 小時
+          const endDateTime = endTime.toISOString().replace(/[-:]/g, '').split('.')[0];
+          
+          calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Hange預約 - ${services}`)}&dates=${startDateTime}/${endDateTime}&details=${encodeURIComponent(`姓名：${name}\n電話：${phone}\n服務：${services}`)}&location=${encodeURIComponent('台北市萬華區西門町 Hange韓哥接髮')}&sf=true&output=xml`;
+        }
+
+        // 呼叫 Google Calendar API
+        fetch('https://calendar-bot-two.vercel.app/api/booking', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            name: name,
+            phone: phone,
+            date: date,
+            time: time,
+            services: Array.from(sel)
           })
-          .catch(err => {
-            alert('發送訊息失敗：' + (err.message || err));
-            console.error(err);
-          });
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (!data.success) {
+            throw new Error(data.message || '預約失敗');
+          }
+          
+          console.log('✅ 已加入 Google Calendar:', data);
+          
+          const flexMessage = {
+            type: 'flex',
+            altText: '預約成功通知',
+            contents: {
+              type: 'bubble',
+              body: {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                  { type: 'text', text: '🎉 預約成功！', weight: 'bold', size: 'lg', align: 'center', color: '#06C755' },
+                  { type: 'text', text: `${date} ${time}`, align: 'center', margin: 'md', size: 'xl', weight: 'bold' },
+                  { type: 'separator', margin: 'md' },
+                  { type: 'text', text: `姓名：${name}`, margin: 'md' },
+                  { type: 'text', text: `電話：${phone}`, margin: 'sm' },
+                  { type: 'text', text: `項目：${services}`, wrap: true, margin: 'sm' },
+                  { type: 'separator', margin: 'md' },
+                  { type: 'text', text: '✅ 已自動加入韓哥行事曆', size: 'sm', color: '#06C755', margin: 'md' }
+                ]
+              },
+              footer: {
+                type: 'box',
+                layout: 'vertical',
+                spacing: 'sm',
+                contents: [
+                  {
+                    type: 'button',
+                    style: 'primary',
+                    action: {
+                      type: 'uri',
+                      label: '📅 加入我的日曆',
+                      uri: calendarUrl
+                    }
+                  },
+                  {
+                    type: 'button',
+                    style: 'secondary',
+                    action: {
+                      type: 'uri',
+                      label: '📍 查看韓哥髮廊地址',
+                      uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
+                    }
+                  }
+                ]
+              }
+            }
+          };
+
+          return liff.sendMessages([flexMessage]);
+        })
+        .then(() => {
+          alert('✅ 預約成功！已自動加入韓哥行事曆，韓哥將親自與您確認！');
+          liff.closeWindow();
+        })
+        .catch(err => {
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+          alert('❌ 預約失敗：' + (err.message || err));
+          console.error('預約錯誤:', err);
+        });
       });
     });
   </script>
