@@ -12,6 +12,7 @@
     label { font-weight:600; color:#2d3748; font-size:15px; }
     input, select, button { padding:12px; border:1px solid #e2e8f0; border-radius:8px; font-size:15px; transition:all .3s ease; }
     input:focus, select:focus { border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.1); }
+    select option:disabled { color:#999; background:#f5f5f5; }
     button { background:#fff; color:#007bff; font-weight:600; cursor:pointer; border:2px solid #007bff; }
     button:hover { background:#e3f2fd; }
     button:disabled { opacity:0.6; cursor:not-allowed; }
@@ -27,7 +28,8 @@
     <div class="notice">
       <strong>📢 預約公告</strong><br>
       ✨ 每週星期一、星期二公休<br>
-      ✨ 週三～週日預約時段：12:30 - 18:00<br>
+      ✨ 週三～週日預約時段：13:00 - 18:00<br>
+      ✨ 每個預約時段為 2 小時<br>
       ✨ 其他時段需求歡迎私訊討論！
     </div>
     <form id="bookingForm">
@@ -37,10 +39,11 @@
       <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
       <label for="date">3. 預約日期：</label>
       <input type="date" id="date" required>
-      <label for="time">4. 預約時段：</label>
-      <select id="time" required>
-        <option value="" disabled selected>請選擇時段</option>
+      <label for="time">4. 預約時段（每次 2 小時）：</label>
+      <select id="time" required disabled>
+        <option value="" disabled selected>請先選擇日期</option>
       </select>
+      <span class="note">* 只顯示可預約的時段（每時段 2 小時）</span>
       <label>5. 預約項目：</label>
       <div class="multi-select" id="serviceOptions">
         <button type="button" data-value="接髮">接髮</button>
@@ -60,25 +63,68 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const timeSelect = document.getElementById('time');
-      for (let h = 12; h <= 18; h++) {
-        for (let m = (h === 12 ? 30 : 0); m < 60; m += 30) {
-          if (h === 18 && m >= 30) break;
-          const t = `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}`;
-          timeSelect.innerHTML += `<option value="${t}">${t}</option>`;
-        }
-      }
-
       const dateInput = document.getElementById('date');
+      
       const todayStr = new Date().toISOString().split('T')[0];
       dateInput.min = todayStr;
       const holidays = ["05/06","05/20","05/27"];
+      
       dateInput.addEventListener('change', function(){
         const d = new Date(this.value);
         const md = `${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
+        
         if ([1,2].includes(d.getDay()) || holidays.includes(md)) {
           alert(`${md} 為公休日，請選其他日期！`);
           this.value = '';
+          timeSelect.innerHTML = '<option value="" disabled selected>請先選擇日期</option>';
+          timeSelect.disabled = true;
+          return;
         }
+        
+        timeSelect.innerHTML = '<option value="" disabled selected>載入中...</option>';
+        timeSelect.disabled = true;
+        
+        fetch(`https://calendar-bot-two.vercel.app/api/available_slots?date=${this.value}`)
+          .then(response => response.json())
+          .then(data => {
+            if (!data.success) {
+              throw new Error(data.error || '查詢失敗');
+            }
+            
+            timeSelect.innerHTML = '<option value="" disabled selected>請選擇時段</option>';
+            
+            // 🆕 所有時段（整點）
+            const allSlots = ['13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+            
+            allSlots.forEach(slot => {
+              const option = document.createElement('option');
+              option.value = slot;
+              
+              if (data.available.includes(slot)) {
+                // 計算結束時間
+                const [hour] = slot.split(':');
+                const endHour = parseInt(hour) + 2;
+                option.textContent = `${slot} - ${endHour}:00 ✅`;
+              } else {
+                option.textContent = `${slot} (已被預約)`;
+                option.disabled = true;
+              }
+              
+              timeSelect.appendChild(option);
+            });
+            
+            timeSelect.disabled = false;
+            
+            if (data.available.length === 0) {
+              alert('當天已無可預約時段，請選擇其他日期！');
+            }
+          })
+          .catch(err => {
+            console.error('查詢時段失敗:', err);
+            alert('查詢可用時段失敗，請稍後再試！');
+            timeSelect.innerHTML = '<option value="" disabled selected>查詢失敗，請重新選擇日期</option>';
+            timeSelect.disabled = false;
+          });
       });
 
       const sel = new Set();
@@ -110,27 +156,23 @@
         submitBtn.textContent = '預約中...';
         submitBtn.disabled = true;
 
-        // 🆕 偵測系統並產生對應的日曆連結
         const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
         let calendarUrl;
 
         if (isIOS) {
-          // iOS 使用 .ics
           const title = encodeURIComponent(`預約：${name} - ${services}`);
           const desc  = encodeURIComponent(`預約服務：${services}\n電話：${phone}\n姓名：${name}`);
           const loc   = encodeURIComponent('台北市萬華區西門町');
           calendarUrl = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}:00&description=${desc}&location=${loc}`;
         } else {
-          // Android/其他使用 Google Calendar
           const startDateTime = `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
           const endTime = new Date(`${date}T${time}`);
-          endTime.setHours(endTime.getHours() + 2); // 預設 2 小時
+          endTime.setHours(endTime.getHours() + 2); // 🆕 固定 2 小時
           const endDateTime = endTime.toISOString().replace(/[-:]/g, '').split('.')[0];
           
           calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Hange預約 - ${services}`)}&dates=${startDateTime}/${endDateTime}&details=${encodeURIComponent(`姓名：${name}\n電話：${phone}\n服務：${services}`)}&location=${encodeURIComponent('台北市萬華區西門町 Hange韓哥接髮')}&sf=true&output=xml`;
         }
 
-        // 呼叫 Google Calendar API
         fetch('https://calendar-bot-two.vercel.app/api/booking', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
@@ -148,7 +190,10 @@
             throw new Error(data.message || '預約失敗');
           }
           
-          console.log('✅ 已加入 Google Calendar:', data);
+          // 計算結束時間
+          const [hour, minute] = time.split(':');
+          const endHour = parseInt(hour) + 2;
+          const endTime = `${endHour.toString().padStart(2, '0')}:${minute}`;
           
           const flexMessage = {
             type: 'flex',
@@ -160,13 +205,14 @@
                 layout: 'vertical',
                 contents: [
                   { type: 'text', text: '🎉 預約成功！', weight: 'bold', size: 'lg', align: 'center', color: '#06C755' },
-                  { type: 'text', text: `${date} ${time}`, align: 'center', margin: 'md', size: 'xl', weight: 'bold' },
+                  { type: 'text', text: `${date}`, align: 'center', margin: 'md', size: 'lg', weight: 'bold' },
+                  { type: 'text', text: `${time} - ${endTime}`, align: 'center', margin: 'sm', size: 'xl', weight: 'bold' },
                   { type: 'separator', margin: 'md' },
                   { type: 'text', text: `姓名：${name}`, margin: 'md' },
                   { type: 'text', text: `電話：${phone}`, margin: 'sm' },
                   { type: 'text', text: `項目：${services}`, wrap: true, margin: 'sm' },
                   { type: 'separator', margin: 'md' },
-                  { type: 'text', text: '✅ 已自動加入韓哥行事曆', size: 'sm', color: '#06C755', margin: 'md' }
+                  { type: 'text', text: '‼️ 點擊下面加入我行事曆避免忘記‼️', size: 'sm', color: '#06C755', margin: 'md' }
                 ]
               },
               footer: {
