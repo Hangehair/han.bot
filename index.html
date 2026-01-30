@@ -115,7 +115,7 @@
         if (isIOS) {
           // iOS 使用 .ics
           const title = encodeURIComponent(`預約：${name} - ${services}`);
-          const desc  = encodeURIComponent(`預約服務：${services}\n電話：${phone}\n姓名：${name}`);
+          const desc  = encodeURIComponent(`預約服務：${services}\\n電話：${phone}\\n姓名：${name}`);
           const loc   = encodeURIComponent('台北市萬華區西門町');
           calendarUrl = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}:00&description=${desc}&location=${loc}`;
         } else {
@@ -125,7 +125,7 @@
           endTime.setHours(endTime.getHours() + 2); // 預設 2 小時
           const endDateTime = endTime.toISOString().replace(/[-:]/g, '').split('.')[0];
           
-          calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Hange預約 - ${services}`)}&dates=${startDateTime}/${endDateTime}&details=${encodeURIComponent(`姓名：${name}\n電話：${phone}\n服務：${services}`)}&location=${encodeURIComponent('台北市萬華區西門町 Hange韓哥接髮')}&sf=true&output=xml`;
+          calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Hange預約 - ${services}`)}&dates=${startDateTime}/${endDateTime}&details=${encodeURIComponent(`姓名：${name}\\n電話：${phone}\\n服務：${services}`)}&location=${encodeURIComponent('台北市萬華區西門町 Hange韓哥接髮')}&sf=true&output=xml`;
         }
 
         // 呼叫 Google Calendar API
