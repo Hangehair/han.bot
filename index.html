@@ -100,6 +100,17 @@
     .login-header { text-align: center; margin-bottom: 30px; }
     .login-header h2 { font-size: 28px; color: #2d3748; margin-bottom: 10px; }
     .login-header p { color: #718096; font-size: 14px; }
+    .otp-container { display: flex; gap: 10px; }
+    .otp-container input { flex: 1; }
+    .otp-container button { flex-shrink: 0; width: auto; padding: 12px 20px; }
+    .success-msg { 
+      background: #d4edda; 
+      color: #155724; 
+      padding: 12px; 
+      border-radius: 8px; 
+      margin-bottom: 15px; 
+      border-left: 4px solid #28a745; 
+    }
   </style>
 </head>
 <body>
@@ -116,12 +127,35 @@
         <h2>💇‍♀️ Hange 韓哥接髮</h2>
         <p>台北西門町接髮專家｜專屬解決方案</p>
       </div>
-      <form id="loginForm">
-        <label for="loginName">👤 姓名：</label>
-        <input type="text" id="loginName" placeholder="請輸入你的姓名" required>
+      
+      <!-- 步驟 1: 輸入手機號碼 -->
+      <form id="phoneForm">
         <label for="loginPhone">📱 手機號碼：</label>
-        <input type="tel" id="loginPhone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
-        <button type="submit">登入 / 註冊</button>
+        <div class="otp-container">
+          <input type="tel" id="loginPhone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
+          <button type="submit">發送驗證碼</button>
+        </div>
+        <span class="note">* 驗證碼將透過 LINE 發送給您</span>
+      </form>
+
+      <!-- 步驟 2: 輸入驗證碼 -->
+      <form id="otpForm" class="hidden">
+        <div class="success-msg">✅ 驗證碼已發送至您的 LINE</div>
+        <label for="otpCode">🔢 驗證碼：</label>
+        <input type="text" id="otpCode" maxlength="6" placeholder="請輸入 6 位數驗證碼" required>
+        <button type="submit">驗證登入</button>
+        <button type="button" id="resendOtp" class="logout-btn">重新發送驗證碼</button>
+      </form>
+
+      <!-- 步驟 3: 完善會員資料 -->
+      <form id="profileForm" class="hidden">
+        <h3 style="text-align: center; color: #2d3748; margin-bottom: 20px;">完善您的資料</h3>
+        <label for="profileName">👤 姓名：</label>
+        <input type="text" id="profileName" placeholder="請輸入您的姓名" required>
+        <label for="profileBirthday">🎂 生日：</label>
+        <input type="date" id="profileBirthday" required>
+        <span class="note">* 生日當天我們會送上專屬優惠！</span>
+        <button type="submit">完成註冊</button>
       </form>
     </div>
 
@@ -132,6 +166,7 @@
           <p><strong>👋 歡迎回來</strong></p>
           <p>🙋‍♂️ <span id="userName"></span></p>
           <p>📞 <span id="userPhone"></span></p>
+          <p>🎂 <span id="userBirthday"></span></p>
           <button id="logoutBtn" class="logout-btn">登出帳號</button>
         </div>
       </div>
@@ -167,15 +202,13 @@
     </div>
   </div>
 
-  <!-- Firebase SDK (相容模式) -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  
-  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   
   <script>
-    // ✅ Firebase 配置
+    // Firebase 配置
     const firebaseConfig = {
       apiKey: "AIzaSyBeep_oCXY7Ae6YYc6N2GPjqdWJX9ZmVx0",
       authDomain: "hange-booking.firebaseapp.com",
@@ -185,34 +218,30 @@
       appId: "1:726740655364:web:dda9500aa9f5ce85f4c451"
     };
 
-    // 初始化 Firebase
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // 全域變數
     let currentUser = null;
     let isLiffEnvironment = false;
+    let pendingPhone = '';
+    let generatedOTP = '';
     const selectedServices = new Set();
 
-    // ========== 初始化 ==========
+    // 初始化
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        // 偵測是否在 LINE 中
         if (typeof liff !== 'undefined') {
           await liff.init({ liffId: "2006300099-OLXDXZlb" });
           isLiffEnvironment = liff.isInClient();
           
           if (isLiffEnvironment && liff.isLoggedIn()) {
-            // LINE 模式：自動登入
             const profile = await liff.getProfile();
             await loginWithLine(profile);
             showBookingScreen();
           } else {
-            // 外部瀏覽器：檢查 localStorage
             checkLocalStorage();
           }
         } else {
-          // 純外部瀏覽器
           checkLocalStorage();
         }
       } catch (error) {
@@ -223,7 +252,6 @@
       setupUI();
     });
 
-    // ========== 檢查 LocalStorage ==========
     function checkLocalStorage() {
       const savedUser = localStorage.getItem('hangeUser');
       if (savedUser) {
@@ -238,15 +266,12 @@
       }
     }
 
-    // ========== 設定 UI ==========
     function setupUI() {
-      // 時間選項
       const timeSelect = document.getElementById('time');
       ['13:00', '14:00', '15:00', '16:00', '17:00', '18:00'].forEach(slot => {
         timeSelect.innerHTML += `<option value="${slot}">${slot}</option>`;
       });
 
-      // 日期限制
       const dateInput = document.getElementById('date');
       dateInput.min = new Date().toISOString().split('T')[0];
       const holidays = ["05/06","05/20","05/27"];
@@ -259,7 +284,6 @@
         }
       });
 
-      // 服務選擇
       document.querySelectorAll('#serviceOptions button').forEach(btn => {
         btn.addEventListener('click', () => {
           const v = btn.dataset.value;
@@ -268,17 +292,144 @@
         });
       });
 
-      // 登入表單
-      document.getElementById('loginForm').addEventListener('submit', handleLogin);
-      
-      // 預約表單
+      document.getElementById('phoneForm').addEventListener('submit', handleSendOTP);
+      document.getElementById('otpForm').addEventListener('submit', handleVerifyOTP);
+      document.getElementById('resendOtp').addEventListener('click', handleResendOTP);
+      document.getElementById('profileForm').addEventListener('submit', handleCompleteProfile);
       document.getElementById('bookingForm').addEventListener('submit', handleBooking);
-      
-      // 登出
       document.getElementById('logoutBtn').addEventListener('click', handleLogout);
     }
 
-    // ========== LINE 登入 ==========
+    // 發送驗證碼
+    async function handleSendOTP(e) {
+      e.preventDefault();
+      const phone = document.getElementById('loginPhone').value.trim();
+
+      if (!phone.match(/^09[0-9]{8}$/)) {
+        alert('請輸入正確的手機號碼（09XXXXXXXX）');
+        return;
+      }
+
+      pendingPhone = phone;
+      generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
+      try {
+        // 透過 LINE 發送驗證碼（如果在 LINE 內）
+        if (isLiffEnvironment) {
+          await liff.sendMessages([{
+            type: 'text',
+            text: `🔐 Hange 韓哥接髮驗證碼\n\n您的驗證碼是：${generatedOTP}\n\n請在 5 分鐘內輸入完成驗證。`
+          }]);
+        }
+
+        // 儲存驗證碼到 Firestore（5分鐘後過期）
+        await db.collection('otpCodes').doc(phone).set({
+          code: generatedOTP,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          expiresAt: new Date(Date.now() + 5 * 60 * 1000)
+        });
+
+        document.getElementById('phoneForm').classList.add('hidden');
+        document.getElementById('otpForm').classList.remove('hidden');
+        
+        if (!isLiffEnvironment) {
+          alert(`驗證碼已生成：${generatedOTP}\n（測試模式，實際使用時會透過 LINE 發送）`);
+        }
+      } catch (error) {
+        console.error('發送驗證碼錯誤:', error);
+        alert('發送驗證碼失敗，請再試一次');
+      }
+    }
+
+    // 重新發送驗證碼
+    async function handleResendOTP() {
+      document.getElementById('otpForm').classList.add('hidden');
+      document.getElementById('phoneForm').classList.remove('hidden');
+    }
+
+    // 驗證 OTP
+    async function handleVerifyOTP(e) {
+      e.preventDefault();
+      const inputOTP = document.getElementById('otpCode').value.trim();
+
+      try {
+        const otpDoc = await db.collection('otpCodes').doc(pendingPhone).get();
+        
+        if (!otpDoc.exists) {
+          alert('驗證碼已過期，請重新發送');
+          return;
+        }
+
+        const otpData = otpDoc.data();
+        if (otpData.code !== inputOTP) {
+          alert('驗證碼錯誤，請重新輸入');
+          return;
+        }
+
+        if (otpData.expiresAt.toDate() < new Date()) {
+          alert('驗證碼已過期，請重新發送');
+          await db.collection('otpCodes').doc(pendingPhone).delete();
+          return;
+        }
+
+        // 驗證成功，刪除驗證碼
+        await db.collection('otpCodes').doc(pendingPhone).delete();
+
+        // 檢查用戶是否已註冊
+        const userDoc = await db.collection('users').doc(pendingPhone).get();
+        
+        if (userDoc.exists) {
+          // 已註冊用戶，直接登入
+          currentUser = {
+            uid: pendingPhone,
+            ...userDoc.data()
+          };
+          localStorage.setItem('hangeUser', JSON.stringify(currentUser));
+          showBookingScreen();
+        } else {
+          // 新用戶，顯示完善資料表單
+          document.getElementById('otpForm').classList.add('hidden');
+          document.getElementById('profileForm').classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error('驗證錯誤:', error);
+        alert('驗證失敗，請再試一次');
+      }
+    }
+
+    // 完善會員資料
+    async function handleCompleteProfile(e) {
+      e.preventDefault();
+      const name = document.getElementById('profileName').value.trim();
+      const birthday = document.getElementById('profileBirthday').value;
+
+      try {
+        currentUser = {
+          uid: pendingPhone,
+          name: name,
+          phone: pendingPhone,
+          birthday: birthday,
+          loginMethod: 'phone',
+          createdAt: new Date().toISOString()
+        };
+
+        await db.collection('users').doc(pendingPhone).set({
+          name: name,
+          phone: pendingPhone,
+          birthday: birthday,
+          loginMethod: 'phone',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        localStorage.setItem('hangeUser', JSON.stringify(currentUser));
+        showBookingScreen();
+      } catch (error) {
+        console.error('註冊錯誤:', error);
+        alert('註冊失敗，請再試一次');
+      }
+    }
+
     async function loginWithLine(profile) {
       try {
         currentUser = {
@@ -288,58 +439,16 @@
           loginMethod: 'line'
         };
         
-        // 儲存到 Firestore
         await db.collection('users').doc(profile.userId).set({
           name: profile.displayName,
           loginMethod: 'line',
           lastLogin: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
-
       } catch (error) {
         console.error('LINE 登入錯誤:', error);
       }
     }
 
-    // ========== 手機號碼登入 ==========
-    async function handleLogin(e) {
-      e.preventDefault();
-      const name = document.getElementById('loginName').value.trim();
-      const phone = document.getElementById('loginPhone').value.trim();
-
-      if (!phone.match(/^09[0-9]{8}$/)) {
-        alert('請輸入正確的手機號碼（09XXXXXXXX）');
-        return;
-      }
-
-      try {
-        const uid = phone;
-        
-        currentUser = {
-          uid: uid,
-          name: name,
-          phone: phone,
-          loginMethod: 'phone'
-        };
-
-        // 儲存到 Firestore
-        await db.collection('users').doc(uid).set({
-          name: name,
-          phone: phone,
-          loginMethod: 'phone',
-          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-
-        // 儲存到 localStorage
-        localStorage.setItem('hangeUser', JSON.stringify(currentUser));
-
-        showBookingScreen();
-      } catch (error) {
-        console.error('登入錯誤:', error);
-        alert('登入失敗，請再試一次');
-      }
-    }
-
-    // ========== 登出 ==========
     function handleLogout() {
       localStorage.removeItem('hangeUser');
       currentUser = null;
@@ -351,7 +460,6 @@
       }
     }
 
-    // ========== 處理預約 ==========
     async function handleBooking(e) {
       e.preventDefault();
       
@@ -374,7 +482,6 @@
       submitBtn.disabled = true;
 
       try {
-        // 呼叫 Google Calendar API
         const response = await fetch('https://calendar-bot-two.vercel.app/api/booking', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
@@ -393,8 +500,8 @@
           throw new Error(data.message || '預約失敗');
         }
 
-        // 儲存預約記錄到 Firestore
-        await db.collection('bookings').add({
+        // 儲存預約記錄
+        const bookingRef = await db.collection('bookings').add({
           userId: currentUser.uid,
           name: currentUser.name,
           phone: currentUser.phone || '',
@@ -402,11 +509,19 @@
           time: time,
           services: services,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          calendarEventId: data.event_id || ''
+          calendarEventId: data.event_id || '',
+          reminderSent: false,
+          // 計算兩個月後提醒日期
+          reminderDate: new Date(new Date(date).setMonth(new Date(date).getMonth() + 2))
+        });
+
+        // 更新用戶最後預約時間
+        await db.collection('users').doc(currentUser.uid).update({
+          lastBookingDate: date,
+          lastBookingServices: services
         });
 
         if (isLiffEnvironment) {
-          // LINE 模式：發送 Flex Message
           const flexMessage = {
             type: 'flex',
             altText: '預約成功通知',
@@ -422,7 +537,8 @@
                   { type: 'text', text: `姓名：${currentUser.name}`, margin: 'md' },
                   { type: 'text', text: `項目：${services.join(', ')}`, wrap: true, margin: 'sm' },
                   { type: 'separator', margin: 'md' },
-                  { type: 'text', text: '✅ 已加入韓哥行事曆', size: 'sm', color: '#06C755', margin: 'md' }
+                  { type: 'text', text: '✅ 已加入韓哥行事曆', size: 'sm', color: '#06C755', margin: 'md' },
+                  { type: 'text', text: '💡 兩個月後我們會提醒您回訪喔！', size: 'xs', color: '#718096', margin: 'sm' }
                 ]
               }
             }
@@ -431,8 +547,7 @@
           alert('✅ 預約成功！韓哥將親自與您確認！');
           liff.closeWindow();
         } else {
-          // 外部瀏覽器模式
-          alert(`✅ 預約成功！\n\n日期：${date} ${time}\n項目：${services.join(', ')}\n\n韓哥將親自與您確認！`);
+          alert(`✅ 預約成功！\n\n日期：${date} ${time}\n項目：${services.join(', ')}\n\n韓哥將親自與您確認！\n💡 兩個月後我們會提醒您回訪喔！`);
           e.target.reset();
           selectedServices.clear();
           document.querySelectorAll('#serviceOptions button').forEach(btn => btn.classList.remove('selected'));
@@ -446,14 +561,12 @@
       }
     }
 
-    // ========== 顯示登入畫面 ==========
     function showLoginScreen() {
       document.getElementById('loadingScreen').classList.add('hidden');
       document.getElementById('loginScreen').classList.remove('hidden');
       document.getElementById('bookingScreen').classList.add('hidden');
     }
 
-    // ========== 顯示預約畫面 ==========
     function showBookingScreen() {
       document.getElementById('loadingScreen').classList.add('hidden');
       document.getElementById('loginScreen').classList.add('hidden');
@@ -461,6 +574,9 @@
       
       document.getElementById('userName').textContent = currentUser.name;
       document.getElementById('userPhone').textContent = currentUser.phone || 'LINE 用戶';
+      document.getElementById('userBirthday').textContent = currentUser.birthday ? 
+        new Date(currentUser.birthday).toLocaleDateString('zh-TW', { month: 'long', day: 'numeric' }) : 
+        '未設定';
     }
   </script>
 </body>
