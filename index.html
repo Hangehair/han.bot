@@ -5,72 +5,252 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>台北西門町接髮專家Hange韓哥預約系統</title>
   <style>
-    body { font-family: 'Arial', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background: linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%); }
-    .container { padding:25px; border-radius:15px; background:#fff; box-shadow:0 6px 20px rgba(0,0,0,0.08); width:100%; max-width:450px; }
-    .notice { background:linear-gradient(90deg,#f8fafc 80%,#e3f2fd 100%); border-left:4px solid #007bff; padding:15px; margin-bottom:20px; border-radius:8px; color:#2d3748; font-size:14px; line-height:1.6; }
-    form { display:flex; flex-direction:column; gap:12px; }
-    label { font-weight:600; color:#2d3748; font-size:15px; }
-    input, select, button { padding:12px; border:1px solid #e2e8f0; border-radius:8px; font-size:15px; transition:all .3s ease; }
-    input:focus, select:focus { border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.1); }
-    button { background:#fff; color:#007bff; font-weight:600; cursor:pointer; border:2px solid #007bff; }
-    button:hover { background:#e3f2fd; }
-    button:disabled { opacity:0.6; cursor:not-allowed; }
-    .multi-select { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-    .multi-select button { padding:12px; border:1px solid #007bff; background:#fff; color:#007bff; border-radius:8px; transition:all .2s; }
-    .multi-select button.selected { background:#007bff; color:#fff; }
-    .multi-select button:hover:not(.selected){ background:#e3f2fd; }
-    .note { font-size:12px; color:#718096; margin-top:-8px; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: 'Arial', sans-serif; 
+      background: linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%); 
+      min-height: 100vh; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      padding: 20px; 
+    }
+    .app-container { width: 100%; max-width: 450px; }
+    .card { 
+      background: #fff; 
+      border-radius: 15px; 
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08); 
+      padding: 25px; 
+      margin-bottom: 15px; 
+    }
+    .notice { 
+      background: linear-gradient(90deg,#f8fafc 80%,#e3f2fd 100%); 
+      border-left: 4px solid #007bff; 
+      padding: 15px; 
+      border-radius: 8px; 
+      color: #2d3748; 
+      font-size: 14px; 
+      line-height: 1.6; 
+      margin-bottom: 20px; 
+    }
+    h2 { color: #2d3748; margin-bottom: 20px; text-align: center; font-size: 24px; }
+    form { display: flex; flex-direction: column; gap: 12px; }
+    label { font-weight: 600; color: #2d3748; font-size: 15px; }
+    input, select, button { 
+      padding: 12px; 
+      border: 1px solid #e2e8f0; 
+      border-radius: 8px; 
+      font-size: 15px; 
+      transition: all .3s ease; 
+      width: 100%; 
+    }
+    input:focus, select:focus { 
+      border-color: #007bff; 
+      box-shadow: 0 0 0 3px rgba(0,123,255,0.1); 
+      outline: none; 
+    }
+    button { 
+      background: #007bff; 
+      color: #fff; 
+      font-weight: 600; 
+      cursor: pointer; 
+      border: none; 
+    }
+    button:hover { background: #0056b3; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .multi-select { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .multi-select button { 
+      padding: 12px; 
+      border: 1px solid #007bff; 
+      background: #fff; 
+      color: #007bff; 
+    }
+    .multi-select button.selected { background: #007bff; color: #fff; }
+    .note { font-size: 12px; color: #718096; margin-top: -8px; }
+    .hidden { display: none !important; }
+    .user-info { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+      padding: 20px; 
+      border-radius: 12px; 
+      margin-bottom: 15px; 
+      color: white; 
+    }
+    .user-info p { margin: 8px 0; font-size: 15px; }
+    .user-info strong { font-weight: 600; }
+    .logout-btn { 
+      background: #dc3545; 
+      margin-top: 10px; 
+      width: 100%;
+    }
+    .logout-btn:hover { background: #c82333; }
+    .loading { text-align: center; padding: 60px 20px; }
+    .spinner { 
+      border: 4px solid #f3f3f3; 
+      border-top: 4px solid #007bff; 
+      border-radius: 50%; 
+      width: 50px; 
+      height: 50px; 
+      animation: spin 1s linear infinite; 
+      margin: 0 auto 20px; 
+    }
+    @keyframes spin { 
+      0% { transform: rotate(0deg); } 
+      100% { transform: rotate(360deg); } 
+    }
+    .login-header { text-align: center; margin-bottom: 30px; }
+    .login-header h2 { font-size: 28px; color: #2d3748; margin-bottom: 10px; }
+    .login-header p { color: #718096; font-size: 14px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="notice">
-      <strong>📢 預約公告</strong><br>
-      ✨ 每週星期一、星期二公休<br>
-      ✨ 週三～週日預約時段：13:00 - 18:00<br>
-      ✨ 其他時段需求歡迎私訊討論！
+  <div class="app-container">
+    <!-- 載入畫面 -->
+    <div id="loadingScreen" class="card loading">
+      <div class="spinner"></div>
+      <p style="color: #718096; font-size: 16px;">系統初始化中...</p>
     </div>
-    <form id="bookingForm">
-      <label for="name">1. 姓名：</label>
-      <input type="text" id="name" placeholder="您的姓名" required>
-      <label for="phone">2. 電話：</label>
-      <input type="tel" id="phone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
-      <label for="date">3. 預約日期：</label>
-      <input type="date" id="date" required>
-      <label for="time">4. 預約時段：</label>
-      <select id="time" required>
-        <option value="" disabled selected>請選擇時段</option>
-      </select>
-      <label>5. 預約項目：</label>
-      <div class="multi-select" id="serviceOptions">
-        <button type="button" data-value="接髮">接髮</button>
-        <button type="button" data-value="染髮">染髮</button>
-        <button type="button" data-value="燙髮">燙髮</button>
-        <button type="button" data-value="剪髮">剪髮</button>
-        <button type="button" data-value="洗髮">洗髮</button>
-        <button type="button" data-value="頭髮護理">頭髮護理</button>
-        <button type="button" data-value="頭皮護理">頭皮護理</button>
+
+    <!-- 登入畫面 -->
+    <div id="loginScreen" class="card hidden">
+      <div class="login-header">
+        <h2>💇‍♀️ Hange 韓哥接髮</h2>
+        <p>台北西門町接髮專家｜專屬解決方案</p>
       </div>
-      <span class="note">* 可複選多個項目</span>
-      <button type="submit">立即預約</button>
-    </form>
+      <form id="loginForm">
+        <label for="loginName">👤 姓名：</label>
+        <input type="text" id="loginName" placeholder="請輸入你的姓名" required>
+        <label for="loginPhone">📱 手機號碼：</label>
+        <input type="tel" id="loginPhone" maxlength="10" pattern="09[0-9]{8}" placeholder="09XXXXXXXX" value="09" required>
+        <button type="submit">登入 / 註冊</button>
+      </form>
+    </div>
+
+    <!-- 預約畫面 -->
+    <div id="bookingScreen" class="hidden">
+      <div class="card">
+        <div id="userInfo" class="user-info">
+          <p><strong>👋 歡迎回來</strong></p>
+          <p>🙋‍♂️ <span id="userName"></span></p>
+          <p>📞 <span id="userPhone"></span></p>
+          <button id="logoutBtn" class="logout-btn">登出帳號</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="notice">
+          <strong>📢 預約公告</strong><br>
+          ✨ 每週星期一、星期二公休<br>
+          ✨ 週三～週日預約時段：13:00 - 18:00<br>
+          ✨ 其他時段需求歡迎私訊討論！
+        </div>
+        <form id="bookingForm">
+          <label for="date">📅 預約日期：</label>
+          <input type="date" id="date" required>
+          <label for="time">⏰ 預約時段：</label>
+          <select id="time" required>
+            <option value="" disabled selected>請選擇時段</option>
+          </select>
+          <label>💇 預約項目：</label>
+          <div class="multi-select" id="serviceOptions">
+            <button type="button" data-value="接髮">接髮</button>
+            <button type="button" data-value="染髮">染髮</button>
+            <button type="button" data-value="燙髮">燙髮</button>
+            <button type="button" data-value="剪髮">剪髮</button>
+            <button type="button" data-value="洗髮">洗髮</button>
+            <button type="button" data-value="頭髮護理">頭髮護理</button>
+            <button type="button" data-value="頭皮護理">頭皮護理</button>
+          </div>
+          <span class="note">* 可複選多個項目</span>
+          <button type="submit">🎉 立即預約</button>
+        </form>
+      </div>
+    </div>
   </div>
 
+  <!-- Firebase SDK (相容模式) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  
+  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // ✅ 新增：固定整點時段 13:00-18:00
+    // ✅ Firebase 配置
+    const firebaseConfig = {
+      apiKey: "AIzaSyBeep_oCXY7Ae6YYc6N2GPjqdWJX9ZmVx0",
+      authDomain: "hange-booking.firebaseapp.com",
+      projectId: "hange-booking",
+      storageBucket: "hange-booking.firebasestorage.app",
+      messagingSenderId: "726740655364",
+      appId: "1:726740655364:web:dda9500aa9f5ce85f4c451"
+    };
+
+    // 初始化 Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // 全域變數
+    let currentUser = null;
+    let isLiffEnvironment = false;
+    const selectedServices = new Set();
+
+    // ========== 初始化 ==========
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // 偵測是否在 LINE 中
+        if (typeof liff !== 'undefined') {
+          await liff.init({ liffId: "2006300099-OLXDXZlb" });
+          isLiffEnvironment = liff.isInClient();
+          
+          if (isLiffEnvironment && liff.isLoggedIn()) {
+            // LINE 模式：自動登入
+            const profile = await liff.getProfile();
+            await loginWithLine(profile);
+            showBookingScreen();
+          } else {
+            // 外部瀏覽器：檢查 localStorage
+            checkLocalStorage();
+          }
+        } else {
+          // 純外部瀏覽器
+          checkLocalStorage();
+        }
+      } catch (error) {
+        console.error('初始化錯誤:', error);
+        checkLocalStorage();
+      }
+
+      setupUI();
+    });
+
+    // ========== 檢查 LocalStorage ==========
+    function checkLocalStorage() {
+      const savedUser = localStorage.getItem('hangeUser');
+      if (savedUser) {
+        try {
+          currentUser = JSON.parse(savedUser);
+          showBookingScreen();
+        } catch (e) {
+          showLoginScreen();
+        }
+      } else {
+        showLoginScreen();
+      }
+    }
+
+    // ========== 設定 UI ==========
+    function setupUI() {
+      // 時間選項
       const timeSelect = document.getElementById('time');
-      const slots = ['13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
-      slots.forEach(slot => {
+      ['13:00', '14:00', '15:00', '16:00', '17:00', '18:00'].forEach(slot => {
         timeSelect.innerHTML += `<option value="${slot}">${slot}</option>`;
       });
 
+      // 日期限制
       const dateInput = document.getElementById('date');
-      const todayStr = new Date().toISOString().split('T')[0];
-      dateInput.min = todayStr;
+      dateInput.min = new Date().toISOString().split('T')[0];
       const holidays = ["05/06","05/20","05/27"];
-      dateInput.addEventListener('change', function(){
+      dateInput.addEventListener('change', function() {
         const d = new Date(this.value);
         const md = `${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
         if ([1,2].includes(d.getDay()) || holidays.includes(md)) {
@@ -79,75 +259,154 @@
         }
       });
 
-      const sel = new Set();
-      document.querySelectorAll('#serviceOptions button').forEach(btn=>{
+      // 服務選擇
+      document.querySelectorAll('#serviceOptions button').forEach(btn => {
         btn.addEventListener('click', () => {
           const v = btn.dataset.value;
           btn.classList.toggle('selected');
-          sel.has(v) ? sel.delete(v) : sel.add(v);
+          selectedServices.has(v) ? selectedServices.delete(v) : selectedServices.add(v);
         });
       });
 
-      liff.init({ liffId: "2006300099-OLXDXZlb" })
-        .then(() => liff.getProfile().then(p => {
-          document.getElementById('name').value = p.displayName;
-        }))
-        .catch(console.error);
+      // 登入表單
+      document.getElementById('loginForm').addEventListener('submit', handleLogin);
+      
+      // 預約表單
+      document.getElementById('bookingForm').addEventListener('submit', handleBooking);
+      
+      // 登出
+      document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+    }
 
-      document.getElementById('bookingForm').addEventListener('submit', e => {
-        e.preventDefault();
-        const name = document.getElementById('name').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const date = dateInput.value;
-        const time = document.getElementById('time').value;
-        const services = Array.from(sel).join(', ');
-        if (!services) return alert('請選擇至少一項服務！');
+    // ========== LINE 登入 ==========
+    async function loginWithLine(profile) {
+      try {
+        currentUser = {
+          uid: profile.userId,
+          name: profile.displayName,
+          phone: '',
+          loginMethod: 'line'
+        };
+        
+        // 儲存到 Firestore
+        await db.collection('users').doc(profile.userId).set({
+          name: profile.displayName,
+          loginMethod: 'line',
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
 
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.textContent;
-        submitBtn.textContent = '預約中...';
-        submitBtn.disabled = true;
+      } catch (error) {
+        console.error('LINE 登入錯誤:', error);
+      }
+    }
 
-        // 🆕 偵測系統並產生對應的日曆連結
-        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-        let calendarUrl;
+    // ========== 手機號碼登入 ==========
+    async function handleLogin(e) {
+      e.preventDefault();
+      const name = document.getElementById('loginName').value.trim();
+      const phone = document.getElementById('loginPhone').value.trim();
 
-        if (isIOS) {
-          // iOS 使用 .ics
-          const title = encodeURIComponent(`預約：${name} - ${services}`);
-          const desc  = encodeURIComponent(`預約服務：${services}\\n電話：${phone}\\n姓名：${name}`);
-          const loc   = encodeURIComponent('台北市萬華區西門町');
-          calendarUrl = `https://han-bot-tkfq.vercel.app/api/ics?title=${title}&start=${date}T${time}:00&description=${desc}&location=${loc}`;
-        } else {
-          // Android/其他使用 Google Calendar
-          const startDateTime = `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
-          const endTime = new Date(`${date}T${time}`);
-          endTime.setHours(endTime.getHours() + 2); // 預設 2 小時
-          const endDateTime = endTime.toISOString().replace(/[-:]/g, '').split('.')[0];
-          
-          calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(`Hange預約 - ${services}`)}&dates=${startDateTime}/${endDateTime}&details=${encodeURIComponent(`姓名：${name}\\n電話：${phone}\\n服務：${services}`)}&location=${encodeURIComponent('台北市萬華區西門町 Hange韓哥接髮')}&sf=true&output=xml`;
-        }
+      if (!phone.match(/^09[0-9]{8}$/)) {
+        alert('請輸入正確的手機號碼（09XXXXXXXX）');
+        return;
+      }
 
+      try {
+        const uid = phone;
+        
+        currentUser = {
+          uid: uid,
+          name: name,
+          phone: phone,
+          loginMethod: 'phone'
+        };
+
+        // 儲存到 Firestore
+        await db.collection('users').doc(uid).set({
+          name: name,
+          phone: phone,
+          loginMethod: 'phone',
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        // 儲存到 localStorage
+        localStorage.setItem('hangeUser', JSON.stringify(currentUser));
+
+        showBookingScreen();
+      } catch (error) {
+        console.error('登入錯誤:', error);
+        alert('登入失敗，請再試一次');
+      }
+    }
+
+    // ========== 登出 ==========
+    function handleLogout() {
+      localStorage.removeItem('hangeUser');
+      currentUser = null;
+      if (isLiffEnvironment) {
+        liff.logout();
+        liff.closeWindow();
+      } else {
+        location.reload();
+      }
+    }
+
+    // ========== 處理預約 ==========
+    async function handleBooking(e) {
+      e.preventDefault();
+      
+      if (!currentUser) {
+        alert('請先登入！');
+        return;
+      }
+
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+      const services = Array.from(selectedServices);
+
+      if (services.length === 0) {
+        alert('請選擇至少一項服務！');
+        return;
+      }
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      submitBtn.textContent = '⏳ 預約中...';
+      submitBtn.disabled = true;
+
+      try {
         // 呼叫 Google Calendar API
-        fetch('https://calendar-bot-two.vercel.app/api/booking', {
+        const response = await fetch('https://calendar-bot-two.vercel.app/api/booking', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify({
-            name: name,
-            phone: phone,
+            name: currentUser.name,
+            phone: currentUser.phone || '未提供',
             date: date,
             time: time,
-            services: Array.from(sel)
+            services: services
           })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (!data.success) {
-            throw new Error(data.message || '預約失敗');
-          }
-          
-          console.log('✅ 已加入 Google Calendar:', data);
-          
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.message || '預約失敗');
+        }
+
+        // 儲存預約記錄到 Firestore
+        await db.collection('bookings').add({
+          userId: currentUser.uid,
+          name: currentUser.name,
+          phone: currentUser.phone || '',
+          date: date,
+          time: time,
+          services: services,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          calendarEventId: data.event_id || ''
+        });
+
+        if (isLiffEnvironment) {
+          // LINE 模式：發送 Flex Message
           const flexMessage = {
             type: 'flex',
             altText: '預約成功通知',
@@ -160,55 +419,49 @@
                   { type: 'text', text: '🎉 預約成功！', weight: 'bold', size: 'lg', align: 'center', color: '#06C755' },
                   { type: 'text', text: `${date} ${time}`, align: 'center', margin: 'md', size: 'xl', weight: 'bold' },
                   { type: 'separator', margin: 'md' },
-                  { type: 'text', text: `姓名：${name}`, margin: 'md' },
-                  { type: 'text', text: `電話：${phone}`, margin: 'sm' },
-                  { type: 'text', text: `項目：${services}`, wrap: true, margin: 'sm' },
+                  { type: 'text', text: `姓名：${currentUser.name}`, margin: 'md' },
+                  { type: 'text', text: `項目：${services.join(', ')}`, wrap: true, margin: 'sm' },
                   { type: 'separator', margin: 'md' },
-                  { type: 'text', text: '✅ 已自動加入韓哥行事曆', size: 'sm', color: '#06C755', margin: 'md' }
-                ]
-              },
-              footer: {
-                type: 'box',
-                layout: 'vertical',
-                spacing: 'sm',
-                contents: [
-                  {
-                    type: 'button',
-                    style: 'primary',
-                    action: {
-                      type: 'uri',
-                      label: '📅 加入我的日曆',
-                      uri: calendarUrl
-                    }
-                  },
-                  {
-                    type: 'button',
-                    style: 'secondary',
-                    action: {
-                      type: 'uri',
-                      label: '📍 查看韓哥髮廊地址',
-                      uri: 'https://maps.app.goo.gl/8GQYF3yosEfm8uJa9'
-                    }
-                  }
+                  { type: 'text', text: '✅ 已加入韓哥行事曆', size: 'sm', color: '#06C755', margin: 'md' }
                 ]
               }
             }
           };
-
-          return liff.sendMessages([flexMessage]);
-        })
-        .then(() => {
-          alert('✅ 預約成功！已自動加入韓哥行事曆，韓哥將親自與您確認！');
+          await liff.sendMessages([flexMessage]);
+          alert('✅ 預約成功！韓哥將親自與您確認！');
           liff.closeWindow();
-        })
-        .catch(err => {
-          submitBtn.textContent = originalText;
-          submitBtn.disabled = false;
-          alert('❌ 預約失敗：' + (err.message || err));
-          console.error('預約錯誤:', err);
-        });
-      });
-    });
+        } else {
+          // 外部瀏覽器模式
+          alert(`✅ 預約成功！\n\n日期：${date} ${time}\n項目：${services.join(', ')}\n\n韓哥將親自與您確認！`);
+          e.target.reset();
+          selectedServices.clear();
+          document.querySelectorAll('#serviceOptions button').forEach(btn => btn.classList.remove('selected'));
+        }
+      } catch (error) {
+        console.error('預約錯誤:', error);
+        alert('❌ 預約失敗：' + error.message);
+      } finally {
+        submitBtn.textContent = '🎉 立即預約';
+        submitBtn.disabled = false;
+      }
+    }
+
+    // ========== 顯示登入畫面 ==========
+    function showLoginScreen() {
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
+      document.getElementById('bookingScreen').classList.add('hidden');
+    }
+
+    // ========== 顯示預約畫面 ==========
+    function showBookingScreen() {
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('bookingScreen').classList.remove('hidden');
+      
+      document.getElementById('userName').textContent = currentUser.name;
+      document.getElementById('userPhone').textContent = currentUser.phone || 'LINE 用戶';
+    }
   </script>
 </body>
 </html>
