@@ -208,7 +208,6 @@
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   
   <script>
-    // Firebase 配置
     const firebaseConfig = {
       apiKey: "AIzaSyBeep_oCXY7Ae6YYc6N2GPjqdWJX9ZmVx0",
       authDomain: "hange-booking.firebaseapp.com",
@@ -227,7 +226,6 @@
     let generatedOTP = '';
     const selectedServices = new Set();
 
-    // 初始化
     document.addEventListener('DOMContentLoaded', async () => {
       try {
         if (typeof liff !== 'undefined') {
@@ -275,11 +273,23 @@
       const dateInput = document.getElementById('date');
       dateInput.min = new Date().toISOString().split('T')[0];
       const holidays = ["05/06","05/20","05/27"];
+      
+      // ✅ 修正：只檢查選擇的日期是否為週一、二
       dateInput.addEventListener('change', function() {
         const d = new Date(this.value);
+        const dayOfWeek = d.getDay(); // 0=週日, 1=週一, 2=週二...
         const md = `${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')}`;
-        if ([1,2].includes(d.getDay()) || holidays.includes(md)) {
-          alert(`${md} 為公休日，請選其他日期！`);
+        
+        // 檢查選擇的日期是否為週一或週二
+        if ([1, 2].includes(dayOfWeek)) {
+          alert('每週一、二公休，請選擇其他日期！');
+          this.value = '';
+          return;
+        }
+        
+        // 檢查是否為特殊假日
+        if (holidays.includes(md)) {
+          alert(`${md} 為特殊假日，請選其他日期！`);
           this.value = '';
         }
       });
@@ -300,7 +310,6 @@
       document.getElementById('logoutBtn').addEventListener('click', handleLogout);
     }
 
-    // 發送驗證碼
     async function handleSendOTP(e) {
       e.preventDefault();
       const phone = document.getElementById('loginPhone').value.trim();
@@ -314,7 +323,6 @@
       generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
 
       try {
-        // 透過 LINE 發送驗證碼（如果在 LINE 內）
         if (isLiffEnvironment) {
           await liff.sendMessages([{
             type: 'text',
@@ -322,7 +330,6 @@
           }]);
         }
 
-        // 儲存驗證碼到 Firestore（5分鐘後過期）
         await db.collection('otpCodes').doc(phone).set({
           code: generatedOTP,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -341,13 +348,11 @@
       }
     }
 
-    // 重新發送驗證碼
     async function handleResendOTP() {
       document.getElementById('otpForm').classList.add('hidden');
       document.getElementById('phoneForm').classList.remove('hidden');
     }
 
-    // 驗證 OTP
     async function handleVerifyOTP(e) {
       e.preventDefault();
       const inputOTP = document.getElementById('otpCode').value.trim();
@@ -372,14 +377,11 @@
           return;
         }
 
-        // 驗證成功，刪除驗證碼
         await db.collection('otpCodes').doc(pendingPhone).delete();
 
-        // 檢查用戶是否已註冊
         const userDoc = await db.collection('users').doc(pendingPhone).get();
         
         if (userDoc.exists) {
-          // 已註冊用戶，直接登入
           currentUser = {
             uid: pendingPhone,
             ...userDoc.data()
@@ -387,7 +389,6 @@
           localStorage.setItem('hangeUser', JSON.stringify(currentUser));
           showBookingScreen();
         } else {
-          // 新用戶，顯示完善資料表單
           document.getElementById('otpForm').classList.add('hidden');
           document.getElementById('profileForm').classList.remove('hidden');
         }
@@ -397,7 +398,6 @@
       }
     }
 
-    // 完善會員資料
     async function handleCompleteProfile(e) {
       e.preventDefault();
       const name = document.getElementById('profileName').value.trim();
@@ -500,8 +500,11 @@
           throw new Error(data.message || '預約失敗');
         }
 
-        // 儲存預約記錄
-        const bookingRef = await db.collection('bookings').add({
+        const bookingDate = new Date(date);
+        const reminderDate = new Date(bookingDate);
+        reminderDate.setMonth(reminderDate.getMonth() + 2);
+
+        await db.collection('bookings').add({
           userId: currentUser.uid,
           name: currentUser.name,
           phone: currentUser.phone || '',
@@ -509,13 +512,11 @@
           time: time,
           services: services,
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          calendarEventId: data.event_id || '',
-          reminderSent: false,
-          // 計算兩個月後提醒日期
-          reminderDate: new Date(new Date(date).setMonth(new Date(date).getMonth() + 2))
+          bookingEventId: data.booking_event_id || '',
+          reminderEventId: data.reminder_event_id || '',
+          reminderDate: reminderDate.toISOString().split('T')[0]
         });
 
-        // 更新用戶最後預約時間
         await db.collection('users').doc(currentUser.uid).update({
           lastBookingDate: date,
           lastBookingServices: services
@@ -538,7 +539,7 @@
                   { type: 'text', text: `項目：${services.join(', ')}`, wrap: true, margin: 'sm' },
                   { type: 'separator', margin: 'md' },
                   { type: 'text', text: '✅ 已加入韓哥行事曆', size: 'sm', color: '#06C755', margin: 'md' },
-                  { type: 'text', text: '💡 兩個月後我們會提醒您回訪喔！', size: 'xs', color: '#718096', margin: 'sm' }
+                  { type: 'text', text: '📅 兩個月後回訪提醒已設定', size: 'xs', color: '#718096', margin: 'sm' }
                 ]
               }
             }
@@ -547,7 +548,7 @@
           alert('✅ 預約成功！韓哥將親自與您確認！');
           liff.closeWindow();
         } else {
-          alert(`✅ 預約成功！\n\n日期：${date} ${time}\n項目：${services.join(', ')}\n\n韓哥將親自與您確認！\n💡 兩個月後我們會提醒您回訪喔！`);
+          alert(`✅ 預約成功！\n\n日期：${date} ${time}\n項目：${services.join(', ')}\n\n韓哥將親自與您確認！\n📅 兩個月後回訪提醒已加入行事曆！`);
           e.target.reset();
           selectedServices.clear();
           document.querySelectorAll('#serviceOptions button').forEach(btn => btn.classList.remove('selected'));
